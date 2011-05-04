@@ -3,6 +3,9 @@ package it.processmining.metric.metric;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.processmining.framework.models.heuristics.HeuristicsNet;
+
+import it.processmining.metric.processrepresentation.HeuristicsNetSetRepresentation;
 import it.processmining.metric.processrepresentation.SetRepresentation;
 
 
@@ -14,6 +17,24 @@ import it.processmining.metric.processrepresentation.SetRepresentation;
  */
 public class JaccardDistance {
 
+	
+	/**
+	 * This method calculates the distance between two processes represented as
+	 * two sets of relations. The distance is calculated as the average of the
+	 * Jaccard distances between the positive and the negative constraints of
+	 * the two processes
+	 * 
+	 * @param hn1 the first process
+	 * @param hn2 the second process
+	 * @return the Jaccard distance between the two processes
+	 */
+	public static double getDistance(HeuristicsNet hn1, HeuristicsNet hn2) {
+		HeuristicsNetSetRepresentation hnsr1 = new HeuristicsNetSetRepresentation(hn1);
+		HeuristicsNetSetRepresentation hnsr2 = new HeuristicsNetSetRepresentation(hn2);
+		return getDistance(hnsr1, hnsr2);
+	}
+	
+	
 	/**
 	 * This method calculates the distance between two processes represented as
 	 * two sets of relations. The distance is calculated as the average of the
