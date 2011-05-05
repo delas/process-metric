@@ -1,16 +1,11 @@
 package it.processmining.metric;
 
 import it.processmining.metric.metric.JaccardDistance;
-import it.processmining.metric.model.Activity;
-import it.processmining.metric.model.BinaryConstraint;
-import it.processmining.metric.model.ConstraintType;
-import it.processmining.metric.processrepresentation.HeuristicsNetSetRepresentation;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.processmining.framework.models.heuristics.HeuristicsNet;
 import org.processmining.importing.heuristicsnet.HeuristicsNetFromFile;
 
 public class MetricCalculator {
