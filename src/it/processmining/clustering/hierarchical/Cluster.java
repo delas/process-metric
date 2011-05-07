@@ -25,6 +25,8 @@ public class Cluster {
 	private Cluster leftChild = null;
 	private Cluster rightChild = null;
 	
+	private DecimalFormat df = new DecimalFormat("#.##");
+	
 	
 	public Cluster(SetRepresentation element) {
 		id = globalId++;
@@ -187,7 +189,6 @@ public class Cluster {
 					DendrogramWidget.dendroCircleSize, DendrogramWidget.dendroCircleSize);
 			
 			g.setColor(Color.GREEN);
-			DecimalFormat df = new DecimalFormat("#.##");
 			g.drawString(df.format(clusterDistance), maxX+lineLength+3, minY+(gapY/2)-2);
 			g.setColor(Color.WHITE);
 			
