@@ -66,13 +66,15 @@ public class JaccardDistance {
 	 */
 	private static <E> double getJaccard(Set<E> s1, Set<E> s2) {	
 		// union
-		Set<E> s3 = new HashSet<E>(s1);
-		s3.addAll(s2);
-		double sizeUnion = s3.size();
+		Set<E> sLocal1 = new HashSet<E>(s1);
+		Set<E> sLocal2 = new HashSet<E>(s2);
+		Set<E> sLocal3 = new HashSet<E>(s1);
+		sLocal3.addAll(sLocal2);
+		double sizeUnion = sLocal3.size();
 
 		// intersection
-		s1.retainAll(s2);
-		double sizeIntersection = s1.size();
+		sLocal1.retainAll(sLocal2);
+		double sizeIntersection = sLocal1.size();
 
 		return sizeIntersection / sizeUnion;
 	}

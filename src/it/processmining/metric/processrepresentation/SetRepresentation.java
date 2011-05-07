@@ -70,6 +70,15 @@ public class SetRepresentation implements ProcessRepresentation {
 	
 	
 	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof SetRepresentation) {
+			return name.equals(((SetRepresentation) obj).getName());
+		}
+		return false;
+	}
+	
+	
+	@Override
 	public String toString() {
 		String s = "";
 		s += "Positive constraints\n";

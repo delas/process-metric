@@ -30,6 +30,8 @@ public class DendrogramTest {
 		set.add(new HeuristicsNetSetRepresentation("hn-demo", hnff1.getNet()));
 		set.add(new HeuristicsNetSetRepresentation("hn-xor", hnff2.getNet()));
 		set.add(new HeuristicsNetSetRepresentation("hn-and", hnff3.getNet()));
+		set.add(new HeuristicsNetSetRepresentation("hn-demo-1", hnff1.getNet()));
+		set.add(new HeuristicsNetSetRepresentation("hn-xor-1", hnff2.getNet()));
 		
 		DistanceMatrix dm = new DistanceMatrix(set);
 		Cluster root = HierarchicalClustering.cluster(set);

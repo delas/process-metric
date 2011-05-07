@@ -16,7 +16,6 @@ public class HierarchicalClustering {
 		
 		Cluster root = null;
 		while(active.size() > 1) {
-//			System.out.println("Border size: " + active.size());
 			
 			Double bestDistance = 2.0;
 			Cluster left = null;

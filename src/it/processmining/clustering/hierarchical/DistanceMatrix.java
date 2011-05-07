@@ -4,6 +4,11 @@ import java.text.DecimalFormat;
 import java.util.Set;
 import java.util.Vector;
 
+import cern.colt.matrix.DoubleFactory2D;
+import cern.colt.matrix.doublealgo.Sorting;
+import cern.colt.matrix.impl.DenseDoubleMatrix2D;
+import cern.colt.matrix.impl.SparseDoubleMatrix2D;
+
 import it.processmining.metric.metric.JaccardDistance;
 import it.processmining.metric.processrepresentation.SetRepresentation;
 
@@ -16,7 +21,7 @@ import it.processmining.metric.processrepresentation.SetRepresentation;
 public class DistanceMatrix {
 	
 	private Vector<SetRepresentation> elements = null;
-	private Vector<Vector<Double>> matrix = null;
+	private SparseDoubleMatrix2D matrix = null;
 
 	
 	/**
@@ -35,19 +40,20 @@ public class DistanceMatrix {
 	 * This private method calculates the distance matrix values
 	 */
 	private void calculateMatrix() {
-		System.out.println("calculation...");
-		matrix = new Vector<Vector<Double>>(elements.size());
-		for (int i = 0; i < elements.size(); i++) {
-			matrix.add(new Vector<Double>(i + 1));
-			for (int j = 0; j < i + 1; j++) {
-				matrix.get(i).add(0.0);
-			}
-		}
+		matrix = new SparseDoubleMatrix2D(elements.size(), elements.size());
+		
+//		matrix = new Vector<Vector<Double>>(elements.size());
+//		for (int i = 0; i < elements.size(); i++) {
+//			matrix.add(new Vector<Double>(i + 1));
+//			for (int j = 0; j < i + 1; j++) {
+//				matrix.get(i).add(0.0);
+//			}
+//		}
 		
 		for (int i = 0; i < elements.size(); i++) {
 			for (int j = 0; j < i + 1; j++) {
 				Double m = JaccardDistance.getDistance(elements.get(i), elements.get(j));
-				matrix.get(i).set(j, m);
+				setValue(i, j, m);
 			}
 		}
 	}
@@ -66,7 +72,17 @@ public class DistanceMatrix {
 			j = i;
 			i = tmp;
 		}
-		return matrix.get(i).get(j);
+		return matrix.get(i, j);
+	}
+	
+	
+	private void setValue(int i, int j, double value) {
+		if (j > i) {
+			int tmp = j;
+			j = i;
+			i = tmp;
+		}
+		matrix.set(i, j, value);
 	}
 	
 	
@@ -77,6 +93,19 @@ public class DistanceMatrix {
 	 */
 	public Vector<? extends SetRepresentation> getElements() {
 		return elements;
+	}
+	
+	
+	/**
+	 * This method returns the index of the given elements into the distance
+	 * matrix
+	 * 
+	 * @param element the current element
+	 * @return the position of the element in the distance matrix, -1 if the
+	 * element is not present
+	 */
+	public Integer getIndexOfElements(SetRepresentation element) {
+		return elements.indexOf(element);
 	}
 	
 	
