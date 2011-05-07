@@ -21,23 +21,18 @@ public class DendrogramTest {
 	
 	public static void main(String s[]) throws FileNotFoundException, IOException {
 	
+		int total = 8;
 		
-		HeuristicsNetFromFile hnff1 = new HeuristicsNetFromFile(new FileInputStream("/home/delas/desktop/hn-demo/demo.hn"));
-		HeuristicsNetFromFile hnff2 = new HeuristicsNetFromFile(new FileInputStream("/home/delas/desktop/hn-xor/model.hn"));
-		HeuristicsNetFromFile hnff3 = new HeuristicsNetFromFile(new FileInputStream("/home/delas/desktop/hn-and/model.hn"));
-		
-		HashSet<HeuristicsNetSetRepresentation> set = new HashSet<HeuristicsNetSetRepresentation>(3);
-		set.add(new HeuristicsNetSetRepresentation("hn-demo", hnff1.getNet()));
-		set.add(new HeuristicsNetSetRepresentation("hn-xor", hnff2.getNet()));
-		set.add(new HeuristicsNetSetRepresentation("hn-and", hnff3.getNet()));
-		set.add(new HeuristicsNetSetRepresentation("hn-demo-1", hnff1.getNet()));
-		set.add(new HeuristicsNetSetRepresentation("hn-xor-1", hnff2.getNet()));
+		HashSet<HeuristicsNetSetRepresentation> set = new HashSet<HeuristicsNetSetRepresentation>(total);
+		for (int i = 1; i <= total; i++) {
+			set.add(new HeuristicsNetSetRepresentation("Process " + i, new HeuristicsNetFromFile(new FileInputStream("/home/delas/desktop/models/"+i+".hn")).getNet()));
+		}
 		
 		DistanceMatrix dm = new DistanceMatrix(set);
 		Cluster root = HierarchicalClustering.cluster(set);
 		
 		DendrogramWidget dw = new DendrogramWidget(dm, root);
-		
+
 		
 		JFrame frame = new JFrame("Dendrogram test");
 		frame.add(dw);

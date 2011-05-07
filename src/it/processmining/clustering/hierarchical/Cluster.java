@@ -85,17 +85,18 @@ public class Cluster {
 		
 		Set<SetRepresentation> currentElements = getAllElements();
 		Set<SetRepresentation> otherElements = c.getAllElements();
-		Double sumSizes = (double) (currentElements.size() + otherElements.size());
 		
+		Double size = 0.0;
 		for (SetRepresentation c1 : currentElements) {
 			for (SetRepresentation c2 : otherElements) {
 				if (!c1.equals(c2)) {
 					sumDistances += JaccardDistance.getDistance(c1, c2);
+					size ++;
 				}
 			}
 		}
 		
-		return (sumDistances / sumSizes);
+		return (sumDistances / size);
 	}
 	
 	

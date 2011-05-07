@@ -161,7 +161,7 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 	 * @return the color object associated with the measure
 	 */
 	private Color measureColor(Double measure) {
-		Color c = new Color(Color.HSBtoRGB(0f, 0.9f, 1-measure.floatValue()));
+		Color c = new Color(Color.HSBtoRGB(0f, 0.99f, 1-measure.floatValue()));
 		return c;
 	}
 
