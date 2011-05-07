@@ -2,6 +2,7 @@ package it.processmining.clustering.hierarchical;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -93,6 +94,7 @@ public class Cluster {
 				}
 			}
 		}
+		
 		return (sumDistances / sumSizes);
 	}
 	
@@ -140,47 +142,53 @@ public class Cluster {
 //	}
 	
 	
-	public Coordinates drawDendrogram(DendrogramWidget dw, Graphics2D gBuf) {
+	public Coordinates drawDendrogram(DendrogramWidget dw, Graphics2D g) {
 		
 		if (getMaxDepth() == 0) {
+			
 			// we are on a leaf, just draw the dot
-			int newY = dw.askForY(element);
-			int newX = dw.askForX();			
-			gBuf.fillOval(newX, newY-(DendrogramWidget.dendroCircleSize/2), DendrogramWidget.dendroCircleSize, DendrogramWidget.dendroCircleSize);
-			return new Coordinates(newX, newY);
+			return new Coordinates(dw.askForX(), dw.askForY(element));
 			
 		} else {
 			
 			// we are on the central body of the dendrogram
 			
-			Coordinates left = leftChild.drawDendrogram(dw, gBuf);
-			Coordinates right= rightChild.drawDendrogram(dw, gBuf);
+			Coordinates left = leftChild.drawDendrogram(dw, g);
+			Coordinates right= rightChild.drawDendrogram(dw, g);
 			
-			int minX = (left.getX() < right.getX())? left.getX() : right.getX();
+//			int minX = (left.getX() < right.getX())? left.getX() : right.getX();
 			int maxX = (left.getX() > right.getX())? left.getX() : right.getX();
 			int minY = (left.getY() < right.getY())? left.getY() : right.getY();
-			int maxY = (left.getY() > right.getY())? left.getY() : right.getY();
+//			int maxY = (left.getY() > right.getY())? left.getY() : right.getY();
 			int gapY = Math.abs(left.getY() - right.getY());
-			int gapX = Math.abs(left.getX() - right.getX());
+//			int gapX = Math.abs(left.getX() - right.getX());
 			
 			// fill the gaps
 			if (left.getX() < maxX) {
-				gBuf.drawLine(left.getX(), left.getY(), maxX, left.getY());
+				g.drawLine(left.getX(), left.getY(), maxX, left.getY());
 				left.setX(maxX);
 			}
 			if (right.getX() < maxX) {
-				gBuf.drawLine(right.getX(), right.getY(), maxX, right.getY());
+				g.drawLine(right.getX(), right.getY(), maxX, right.getY());
 				right.setX(maxX);
 			}
 			
 			// calculate the length of the line, proportional to the distance of the cluster
-			Double clusterDistance = rightChild.getDistance(leftChild);
+			Double clusterDistance = leftChild.getDistance(rightChild);
 			int lineLength = DendrogramWidget.dendroMinLineLength + (int) (clusterDistance * (DendrogramWidget.dendroMaxLineLength - DendrogramWidget.dendroMinLineLength));
 			
 			// draw the three lines
-			gBuf.drawLine(left.getX(), left.getY(), left.getX()+lineLength, left.getY());
-			gBuf.drawLine(right.getX(), right.getY(), right.getX()+lineLength, right.getY());
-			gBuf.drawLine(maxX+lineLength, minY, maxX+lineLength, minY+gapY);
+			g.drawLine(left.getX(), left.getY(), left.getX()+lineLength, left.getY());
+			g.drawLine(right.getX(), right.getY(), right.getX()+lineLength, right.getY());
+			g.drawLine(maxX+lineLength, minY, maxX+lineLength, minY+gapY);
+			
+			g.fillOval(maxX+lineLength-(DendrogramWidget.dendroCircleSize/2), minY+(gapY/2)-(DendrogramWidget.dendroCircleSize/2),
+					DendrogramWidget.dendroCircleSize, DendrogramWidget.dendroCircleSize);
+			
+			g.setColor(Color.GREEN);
+			DecimalFormat df = new DecimalFormat("#.##");
+			g.drawString(df.format(clusterDistance), maxX+lineLength+3, minY+(gapY/2)-2);
+			g.setColor(Color.WHITE);
 			
 			return new Coordinates(maxX+lineLength, minY+(gapY/2));
 		}
