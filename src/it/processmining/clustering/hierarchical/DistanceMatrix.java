@@ -15,7 +15,7 @@ import it.processmining.metric.processrepresentation.SetRepresentation;
  */
 public class DistanceMatrix {
 	
-	private Vector<? extends SetRepresentation> elements = null;
+	private Vector<SetRepresentation> elements = null;
 	private Vector<Vector<Double>> matrix = null;
 
 	
@@ -35,6 +35,7 @@ public class DistanceMatrix {
 	 * This private method calculates the distance matrix values
 	 */
 	private void calculateMatrix() {
+		System.out.println("calculation...");
 		matrix = new Vector<Vector<Double>>(elements.size());
 		for (int i = 0; i < elements.size(); i++) {
 			matrix.add(new Vector<Double>(i + 1));

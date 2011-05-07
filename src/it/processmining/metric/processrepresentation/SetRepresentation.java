@@ -10,7 +10,8 @@ public class SetRepresentation implements ProcessRepresentation {
 	
 	protected HashSet<BinaryConstraint> followedConstraints = new HashSet<BinaryConstraint>();
 	protected HashSet<BinaryConstraint> notFollowedConstraints = new HashSet<BinaryConstraint>();
-
+	protected String name;
+	
 	
 	public int getSize(ConstraintType ct) {
 		if (ct.equals(ConstraintType.FOLLOWED_BY)) {
@@ -19,6 +20,16 @@ public class SetRepresentation implements ProcessRepresentation {
 			return notFollowedConstraints.size();
 		}
 		return -1;
+	}
+	
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	
+	public String getName() {
+		return name;
 	}
 	
 	

@@ -29,8 +29,8 @@ public class JaccardDistance {
 	 * @return the Jaccard distance between the two processes
 	 */
 	public static double getDistance(HeuristicsNet hn1, HeuristicsNet hn2) {
-		HeuristicsNetSetRepresentation hnsr1 = new HeuristicsNetSetRepresentation(hn1);
-		HeuristicsNetSetRepresentation hnsr2 = new HeuristicsNetSetRepresentation(hn2);
+		HeuristicsNetSetRepresentation hnsr1 = new HeuristicsNetSetRepresentation("", hn1);
+		HeuristicsNetSetRepresentation hnsr2 = new HeuristicsNetSetRepresentation("", hn2);
 		return getDistance(hnsr1, hnsr2);
 	}
 	

@@ -1,20 +1,22 @@
 package it.processmining.clustering.hierarchical;
 
+import java.util.Set;
 import java.util.Vector;
 
 import it.processmining.metric.processrepresentation.SetRepresentation;
 
 public class HierarchicalClustering {
-
-	private DistanceMatrix distanceMatrix = null;
 	
-	public void cluster(DistanceMatrix distanceMatrix) {
-		this.distanceMatrix = distanceMatrix;
+	public static Cluster cluster(Set<? extends SetRepresentation> elements) {
 		
 		Vector<Cluster> active = new Vector<Cluster>();
-		// populate "active" with all the singleton cluster
+		for (SetRepresentation sr : elements) {
+			active.add(new Cluster(sr));
+		}
 		
+		Cluster root = null;
 		while(active.size() > 1) {
+//			System.out.println("Border size: " + active.size());
 			
 			Double bestDistance = 2.0;
 			Cluster left = null;
@@ -33,11 +35,14 @@ public class HierarchicalClustering {
 				}
 			}
 			
-			// remove left and right
-			// add a new cluster as merge of left and right
+			active.remove(left);
+			active.remove(right);
 			
+			root = new Cluster(left, right);
+			active.add(root);
 		}
-
+		
+		return root;
 		
 	}
 }

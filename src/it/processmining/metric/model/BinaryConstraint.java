@@ -89,8 +89,6 @@ public class BinaryConstraint {
 	    hash = hash * 31 + (secondActivity == null ? 0 : secondActivity.hashCode());
 	    hash = hash * 31 + (type == null ? 0 : type.hashCode());
 	    return hash;
-	    
-//		return 1;
 	}
 	
 	

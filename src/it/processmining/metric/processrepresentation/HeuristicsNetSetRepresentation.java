@@ -13,9 +13,10 @@ public class HeuristicsNetSetRepresentation extends SetRepresentation {
 	private int activityCounter;
 
 	
-	public HeuristicsNetSetRepresentation(HeuristicsNet hn) {
+	public HeuristicsNetSetRepresentation(String name, HeuristicsNet hn) {
 		this.hn = hn;
 		this.activityCounter = hn.size();
+		setName(name);
 		generateSets(hn);
 	}
 	
