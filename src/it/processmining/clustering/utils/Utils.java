@@ -1,4 +1,4 @@
-package it.processmining.utils;
+package it.processmining.clustering.utils;
 
 public class Utils {
 

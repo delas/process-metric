@@ -2,7 +2,7 @@ package it.processmining.clustering.ui;
 
 import it.processmining.clustering.hierarchical.Cluster;
 import it.processmining.clustering.hierarchical.DistanceMatrix;
-import it.processmining.metric.processrepresentation.SetRepresentation;
+import it.processmining.clustering.model.process.SetRepresentation;
 
 import java.awt.Color;
 import java.awt.Font;

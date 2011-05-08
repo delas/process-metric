@@ -1,12 +1,12 @@
-package it.processmining.metric.metric;
+package it.processmining.clustering.metric;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import org.processmining.framework.models.heuristics.HeuristicsNet;
 
-import it.processmining.metric.processrepresentation.HeuristicsNetSetRepresentation;
-import it.processmining.metric.processrepresentation.SetRepresentation;
+import it.processmining.clustering.model.process.HeuristicsNetSetRepresentation;
+import it.processmining.clustering.model.process.SetRepresentation;
 
 
 /**

@@ -1,9 +1,9 @@
-package it.processmining.test;
+package it.processmining.clustering.test;
 
 import it.processmining.clustering.hierarchical.Cluster;
 import it.processmining.clustering.hierarchical.DistanceMatrix;
 import it.processmining.clustering.hierarchical.HierarchicalClustering;
-import it.processmining.metric.processrepresentation.HeuristicsNetSetRepresentation;
+import it.processmining.clustering.model.process.HeuristicsNetSetRepresentation;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

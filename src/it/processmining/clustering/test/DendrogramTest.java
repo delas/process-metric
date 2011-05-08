@@ -1,10 +1,10 @@
-package it.processmining.test;
+package it.processmining.clustering.test;
 
 import it.processmining.clustering.hierarchical.Cluster;
 import it.processmining.clustering.hierarchical.DistanceMatrix;
 import it.processmining.clustering.hierarchical.HierarchicalClustering;
+import it.processmining.clustering.model.process.HeuristicsNetSetRepresentation;
 import it.processmining.clustering.ui.DendrogramWidget;
-import it.processmining.metric.processrepresentation.HeuristicsNetSetRepresentation;
 
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;

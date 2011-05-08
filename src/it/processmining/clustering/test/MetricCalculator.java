@@ -1,6 +1,6 @@
-package it.processmining.test;
+package it.processmining.clustering.test;
 
-import it.processmining.metric.metric.JaccardDistance;
+import it.processmining.clustering.metric.JaccardDistance;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

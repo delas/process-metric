@@ -1,4 +1,4 @@
-package it.processmining.metric.model;
+package it.processmining.clustering.model;
 
 /**
  * Class that describes an activity as its name

@@ -1,4 +1,4 @@
-package it.processmining.metric.model;
+package it.processmining.clustering.model;
 
 /**
  * This class describes a binary constraint between activities

@@ -1,4 +1,4 @@
-package it.processmining.metric.processrepresentation;
+package it.processmining.clustering.model.process;
 
 import java.util.Vector;
 

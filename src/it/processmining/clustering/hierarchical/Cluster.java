@@ -8,11 +8,11 @@ import java.util.Set;
 
 import org.processmining.analysis.performance.advanceddottedchartanalysis.ui.CoordinationUtil;
 
+import it.processmining.clustering.metric.JaccardDistance;
+import it.processmining.clustering.model.process.SetRepresentation;
 import it.processmining.clustering.ui.Coordinates;
 import it.processmining.clustering.ui.DendrogramWidget;
-import it.processmining.metric.metric.JaccardDistance;
-import it.processmining.metric.processrepresentation.SetRepresentation;
-import it.processmining.utils.Utils;
+import it.processmining.clustering.utils.Utils;
 
 public class Cluster {
 

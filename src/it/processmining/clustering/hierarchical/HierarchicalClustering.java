@@ -3,11 +3,12 @@ package it.processmining.clustering.hierarchical;
 import java.util.Set;
 import java.util.Vector;
 
-import it.processmining.metric.processrepresentation.SetRepresentation;
+import it.processmining.clustering.model.process.SetRepresentation;
 
 public class HierarchicalClustering {
 	
 	public static Cluster cluster(Set<? extends SetRepresentation> elements) {
+		
 		
 		Vector<Cluster> active = new Vector<Cluster>();
 		for (SetRepresentation sr : elements) {

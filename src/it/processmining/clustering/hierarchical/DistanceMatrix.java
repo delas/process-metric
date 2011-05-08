@@ -9,8 +9,8 @@ import cern.colt.matrix.doublealgo.Sorting;
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 import cern.colt.matrix.impl.SparseDoubleMatrix2D;
 
-import it.processmining.metric.metric.JaccardDistance;
-import it.processmining.metric.processrepresentation.SetRepresentation;
+import it.processmining.clustering.metric.JaccardDistance;
+import it.processmining.clustering.model.process.SetRepresentation;
 
 /**
  * This class represents the distance matrix of a set of elements

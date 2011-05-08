@@ -1,10 +1,10 @@
-package it.processmining.metric.processrepresentation;
+package it.processmining.clustering.model.process;
 
 import java.util.HashSet;
 
-import it.processmining.metric.model.Activity;
-import it.processmining.metric.model.BinaryConstraint;
-import it.processmining.metric.model.ConstraintType;
+import it.processmining.clustering.model.Activity;
+import it.processmining.clustering.model.BinaryConstraint;
+import it.processmining.clustering.model.ConstraintType;
 
 public class SetRepresentation implements ProcessRepresentation {
 	
