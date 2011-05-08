@@ -159,20 +159,19 @@ public class Cluster {
 			Coordinates left = leftChild.drawDendrogram(dw, g);
 			Coordinates right= rightChild.drawDendrogram(dw, g);
 			
-//			int minX = (left.getX() < right.getX())? left.getX() : right.getX();
+			g.setColor(DendrogramWidget.dendroColor);
+			
 			int maxX = (left.getX() > right.getX())? left.getX() : right.getX();
 			int minY = (left.getY() < right.getY())? left.getY() : right.getY();
-//			int maxY = (left.getY() > right.getY())? left.getY() : right.getY();
 			int gapY = Math.abs(left.getY() - right.getY());
-//			int gapX = Math.abs(left.getX() - right.getX());
 			
 			// fill the gaps
 			if (left.getX() < maxX) {
-				g.drawLine(left.getX(), left.getY(), maxX, left.getY());
+				g.drawLine(left.getX(), left.getY(), maxX-1, left.getY());
 				left.setX(maxX);
 			}
 			if (right.getX() < maxX) {
-				g.drawLine(right.getX(), right.getY(), maxX, right.getY());
+				g.drawLine(right.getX(), right.getY(), maxX-1, right.getY());
 				right.setX(maxX);
 			}
 			
@@ -188,34 +187,11 @@ public class Cluster {
 			g.fillOval(maxX+lineLength-(DendrogramWidget.dendroCircleSize/2), minY+(gapY/2)-(DendrogramWidget.dendroCircleSize/2),
 					DendrogramWidget.dendroCircleSize, DendrogramWidget.dendroCircleSize);
 			
-			g.setColor(Color.GREEN);
+			g.setColor(DendrogramWidget.labelColor);
 			g.drawString(df.format(clusterDistance), maxX+lineLength+3, minY+(gapY/2)-2);
-			g.setColor(Color.WHITE);
 			
 			return new Coordinates(maxX+lineLength, minY+(gapY/2));
 		}
-	}
-	
-	
-	protected String getDotOfSubgraph() {
-		String s = "";
-		
-		if (element == null) {
-			s += id + " [shape=diamond,style=filled,label=\"\",height=.2,width=.2] \n";
-		} else {
-			s += id + " [shape=box,regular=1,style=filled,fillcolor=green,label=\""+ element.getName() +"\"] ; \n";	
-		}
-		
-		if (leftChild != null) {
-			s += id + " -> " + leftChild.id + "; \n";
-			s += leftChild.getDotOfSubgraph();
-		}
-		if (rightChild != null) {
-			s += id + " -> " + rightChild.id + "; \n";
-			s += rightChild.getDotOfSubgraph();
-		}
-		
-		return s;
 	}
 	
 	
