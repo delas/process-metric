@@ -3,12 +3,16 @@ package it.processmining.clustering.hierarchical;
 import java.util.Set;
 import java.util.Vector;
 
+import it.processmining.clustering.exceptions.ClusteringException;
 import it.processmining.clustering.model.process.SetRepresentation;
 
 public class HierarchicalClustering {
 	
-	public static Cluster cluster(Set<? extends SetRepresentation> elements) {
+	public static Cluster cluster(Set<? extends SetRepresentation> elements) throws ClusteringException {
 		
+		if (elements.size() < 2) {
+			throw new ClusteringException("Unsufficient number of elements");
+		}
 		
 		Vector<Cluster> active = new Vector<Cluster>();
 		for (SetRepresentation sr : elements) {

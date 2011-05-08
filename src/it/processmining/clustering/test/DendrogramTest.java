@@ -1,5 +1,6 @@
 package it.processmining.clustering.test;
 
+import it.processmining.clustering.exceptions.ClusteringException;
 import it.processmining.clustering.hierarchical.Cluster;
 import it.processmining.clustering.hierarchical.DistanceMatrix;
 import it.processmining.clustering.hierarchical.HierarchicalClustering;
@@ -19,7 +20,7 @@ import org.processmining.importing.heuristicsnet.HeuristicsNetFromFile;
 
 public class DendrogramTest {
 	
-	public static void main(String s[]) throws FileNotFoundException, IOException {
+	public static void main(String s[]) throws FileNotFoundException, IOException, ClusteringException {
 	
 		int total = 8;
 		

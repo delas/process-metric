@@ -46,9 +46,18 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 	// the size of a circle of the dendrogram
 	public static final int dendroCircleSize = 5;
 	// maximum length of connectors
-	public static int dendroMaxLineLength = 50;
+	public static int dendroMaxLineLength = 100;
 	// minimum length of connectors
 	public static final int dendroMinLineLength = 5;
+	// colors configuration
+	public static final Color background = Color.BLACK;
+	public static final Color labelColor = new Color(172, 229, 254, (int) (255*(.8)));
+	public static final Color dendroColor = Color.WHITE;
+	public static final Color matrixBrightestColor = Color.RED;
+	public static final Color infoBoxBackground = new Color(.05f, .05f, .05f);
+	public static final Color infoBoxLines = new Color(.5f, .5f, .5f, .5f);
+	public static final Color infoBoxLabels = new Color(1f, 1f, 1f, 0.5f);
+	
 	
 	// internal elements
 	private Cluster root;
@@ -119,12 +128,13 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 		// general declaration
 		int width = getWidth();
 		int height = getHeight();
+		int sizeOfMatrix = numberOfElements*matrixBlockSize;
 		
 		Graphics2D g2d = (Graphics2D)g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		
 		// draw background
-		g2d.setColor(Color.BLACK);
+		g2d.setColor(background);
 		g2d.fillRect(0, 0, width, height);
 		
 		// paint of the dendrogram
@@ -146,7 +156,8 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 		}
 		
 		// draw the labels
-		g.setColor(Color.GREEN);
+//		g.setColor(Color.GREEN);
+		g.setColor(new Color(172, 229, 254, (int) (255*(.8))));
 		for(int i = 0; i < numberOfElements; i++) {
 			String s = dm.getElements().get(coordinates.get(i)).getName();
 			int internalOffsetX = spaceForLabelX - fm.stringWidth(s) - 5;
@@ -155,7 +166,7 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 			g.drawString(s, offsetX + internalOffsetX, (int) (offsetY + spaceForLabelY + (matrixBlockSize/2) + 5 + (i*matrixBlockSize)));
 			
 			g2d.rotate(Math.PI*3/2);
-			g.drawString(s, -(offsetY + internalOffsetY), (int) (offsetX + spaceForLabelX + (matrixBlockSize/2) + (i*matrixBlockSize)));
+			g.drawString(s, -(offsetY + internalOffsetY), (int) (offsetX + spaceForLabelX + (matrixBlockSize/2) + (i*matrixBlockSize) + 5));
 			g2d.rotate(Math.PI/2);
 		}
 		
@@ -164,68 +175,77 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 			int xCoord = (mouseMovingX - matrixBeginX) / matrixBlockSize;
 			int yCoord = (mouseMovingY - matrixBeginY) / matrixBlockSize;
 			
-			String s1 = dm.getElements().get(coordinates.get(yCoord)).getName();
-			String s2 = dm.getElements().get(coordinates.get(xCoord)).getName();
-			int textS1xWidth = fm.stringWidth(s1) + 10;
-			int textS2Width = fm.stringWidth(s2) + 10;
-			int textMaxWidth = (textS1xWidth > textS2Width) ? textS1xWidth : textS2Width;
-			if (textMaxWidth < 100) textMaxWidth = 70;
+//			String s1 = dm.getElements().get(coordinates.get(yCoord)).getName();
+//			String s2 = dm.getElements().get(coordinates.get(xCoord)).getName();
+//			int textS1xWidth = fm.stringWidth(s1) + 10;
+//			int textS2Width = fm.stringWidth(s2) + 10;
+//			int textMaxWidth = (textS1xWidth > textS2Width) ? textS1xWidth : textS2Width;
+//			int textMaxWidth = 300;
+//			if (textMaxWidth < sizeOfMatrix) textMaxWidth = sizeOfMatrix;
 			
-			g2d.setColor(new Color(0, 0, 0, 0.9f));
+			g2d.setColor(infoBoxLines);
+			// oval on the cell
 			g2d.drawOval(
 					matrixBeginX + (xCoord*matrixBlockSize) + (matrixBlockSize/2) - 5,
 					matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize/2) - 5,
 					10, 10);
+			// connector from the matrix border to the oval
 			g2d.drawLine(
 					matrixBeginX,
 					matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize/2),
-					matrixBeginX + (xCoord*matrixBlockSize) + (matrixBlockSize/2) - 5,
+					matrixBeginX + (xCoord*matrixBlockSize) + (matrixBlockSize/2) - 6,
 					matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize/2));
+			// connector from the oval to the infobox
 			g2d.drawLine(
 					matrixBeginX + (xCoord*matrixBlockSize) + (matrixBlockSize/2),
-					matrixBeginY,
+					matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize/2) + 6,
 					matrixBeginX + (xCoord*matrixBlockSize) + (matrixBlockSize/2),
-					matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize/2) - 5);
+					matrixBeginY + sizeOfMatrix + 14);
 			
 			if (xCoord != yCoord) {
+				// second oval
 				g2d.drawOval(
 						matrixBeginX + (yCoord*matrixBlockSize) + (matrixBlockSize/2) - 5,
 						matrixBeginY + (xCoord*matrixBlockSize) + (matrixBlockSize/2) - 5,
 						10, 10);
+				// connector between the two ovals
+				int mult = (xCoord > yCoord)? -1 : 1;
+				g2d.drawLine(
+						matrixBeginX + (xCoord*matrixBlockSize) + (matrixBlockSize/2) + (4*mult),
+						matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize/2) - (4*mult),
+						matrixBeginX + (yCoord*matrixBlockSize) + (matrixBlockSize/2) - (4*mult),
+						matrixBeginY + (xCoord*matrixBlockSize) + (matrixBlockSize/2) + (4*mult));
+				// connector from the second oval to the matrix border
 				g2d.drawLine(
 						matrixBeginX,
 						matrixBeginY + (xCoord*matrixBlockSize) + (matrixBlockSize/2),
-						matrixBeginX + (yCoord*matrixBlockSize) + (matrixBlockSize/2) - 5,
+						matrixBeginX + (yCoord*matrixBlockSize) + (matrixBlockSize/2) - 6,
 						matrixBeginY + (xCoord*matrixBlockSize) + (matrixBlockSize/2));
-				g2d.drawLine(
-						matrixBeginX + (yCoord*matrixBlockSize) + (matrixBlockSize/2),
-						matrixBeginY,
-						matrixBeginX + (yCoord*matrixBlockSize) + (matrixBlockSize/2),
-						matrixBeginY + (xCoord*matrixBlockSize) + (matrixBlockSize/2) - 5);
 			}
 			
-			g2d.drawLine(
-					matrixBeginX + (xCoord*matrixBlockSize) + (matrixBlockSize/2) + 5,
-					matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize/2),
-					matrixBeginX + (xCoord*matrixBlockSize) + (matrixBlockSize/2) + 14,
-					matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize/2));
+			int infoBoxOffset = (xCoord*matrixBlockSize);
+			Double dis = dm.getValue(coordinates.get(xCoord), coordinates.get(yCoord));
+			String textLine1 = "Similarity: " + df.format(1-dis);
+			String textLine2 = "Distance: " + df.format(dis);
+			int infoBoxWidth = fm.stringWidth(textLine1);
+			if (fm.stringWidth(textLine2) > infoBoxWidth) infoBoxWidth = fm.stringWidth(textLine2);
+			
+			// the actual info box
+			g.setColor(infoBoxBackground);
 			g2d.fillRoundRect(
-					matrixBeginX + (xCoord*matrixBlockSize) + (matrixBlockSize/2) + 15,
-					matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize/2) - 5,
-					textMaxWidth + 20, 64, 10, 10);
-			g2d.setColor(Color.GREEN);
-			g2d.drawString(s1,
-					matrixBeginX + (xCoord*matrixBlockSize) + (matrixBlockSize/2) + 25,
-					matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize/2) + 12);
-			g2d.drawString(s2,
-					matrixBeginX + (xCoord*matrixBlockSize) + (matrixBlockSize/2) + 25,
-					matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize/2) + 24);
-			g2d.drawString("D: " + df.format(dm.getValue(coordinates.get(xCoord), coordinates.get(yCoord))),
-					matrixBeginX + (xCoord*matrixBlockSize) + (matrixBlockSize/2) + 25,
-					matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize/2) + 40);
-			g2d.drawString("S: " + df.format(1 - dm.getValue(coordinates.get(xCoord), coordinates.get(yCoord))),
-					matrixBeginX + (xCoord*matrixBlockSize) + (matrixBlockSize/2) + 25,
-					matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize/2) + 52);
+					matrixBeginX + infoBoxOffset,
+					matrixBeginY + sizeOfMatrix + 15,
+					infoBoxWidth + 20, 45, 10, 10);
+			g2d.setColor(infoBoxLines);
+			g2d.drawRoundRect(
+					matrixBeginX + infoBoxOffset,
+					matrixBeginY + sizeOfMatrix + 15,
+					infoBoxWidth + 20, 45, 10, 10);
+			
+			// texts inside the info box
+			g.setColor(infoBoxLabels);
+			g2d.drawString(textLine1, matrixBeginX + infoBoxOffset + 10, matrixBeginY + sizeOfMatrix + 35);
+			g2d.drawString(textLine2, matrixBeginX + infoBoxOffset + 10, matrixBeginY + sizeOfMatrix + 50);
 		}
 		
 		g2d.dispose();
@@ -240,7 +260,9 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 	 * @return the color object associated with the measure
 	 */
 	private Color measureColor(Double measure) {
-		Color c = new Color(Color.HSBtoRGB(0f, 0.99f, 1-measure.floatValue()));
+//		Color c = new Color(Color.HSBtoRGB(0f, 0.99f, 1-measure.floatValue()));
+//		Color c = new Color(172, 229, 254, (int) (255*(1-measure)));
+		Color c = new Color(matrixBrightestColor.getRed(), matrixBrightestColor.getGreen(), matrixBrightestColor.getBlue(), (int) (255*(1-measure)));
 		return c;
 	}
 
