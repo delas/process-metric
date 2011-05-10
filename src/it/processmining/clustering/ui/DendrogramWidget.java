@@ -10,23 +10,15 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DragGestureEvent;
-import java.awt.dnd.DragGestureListener;
-import java.awt.dnd.DragSource;
-import java.awt.dnd.DragSourceDragEvent;
-import java.awt.dnd.DragSourceDropEvent;
-import java.awt.dnd.DragSourceEvent;
-import java.awt.dnd.DragSourceListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.sql.Blob;
+import java.awt.image.BufferedImageOp;
 import java.text.DecimalFormat;
-import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.JComponent;
@@ -46,9 +38,10 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 	// the size of a circle of the dendrogram
 	public static final int dendroCircleSize = 5;
 	// maximum length of connectors
-	public static int dendroMaxLineLength = 100;
+//	public static int dendroMaxLineLength = 100;
+	public static int dendroWidth = 400;
 	// minimum length of connectors
-	public static final int dendroMinLineLength = 5;
+//	public static final int dendroMinLineLength = 5;
 	// colors configuration
 	public static final Color background = Color.BLACK;
 	public static final Color labelColor = new Color(172, 229, 254, (int) (255*(.8)));
@@ -57,6 +50,12 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 	public static final Color infoBoxBackground = new Color(.05f, .05f, .05f, .9f);
 	public static final Color infoBoxLines = new Color(.5f, .5f, .5f, .5f);
 	public static final Color infoBoxLabels = new Color(1f, 1f, 1f, 0.5f);
+	public static final Color scaleColor = new Color(1f, 1f, 1f, 0.5f);
+	
+	public static final Color infoDendrogramBackground = new Color(.1f, .1f, .1f, 1f);
+	public static final Color infoDendrogramLines =      new Color(.4f, .4f, .4f, 1f);
+	public static final Color infoDendrogramLabels =     new Color(.6f, .6f, .6f, 1f);
+	public static final float infoDendrogramFontSize = 16f;
 	
 	
 	// internal elements
@@ -70,7 +69,7 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 	private int currentY;
 	
 	private int offsetX = 10;
-	private int offsetY = 10;
+	private int offsetY = 10; 
 	
 	private int spaceForLabelX = 100;
 	private int spaceForLabelY = 100;
@@ -78,13 +77,13 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 	DecimalFormat df = new DecimalFormat("#.###");
 	
 	// mouse listener indexes
-	private int movingX = -1;
-	private int movingY = -1;
 	private int mouseMovingX = -1;
 	private int mouseMovingY = -1;
 	private int matrixBeginX = offsetX + spaceForLabelX;
 	private int matrixBeginY = offsetY + spaceForLabelY;
 	private boolean mouseOverMatrix = false;
+	private boolean mouseOverDendrogram = false;
+	private int motionPixels = 0;
 	
 	
 	public DendrogramWidget(DistanceMatrix dm, Cluster root) {
@@ -116,6 +115,26 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 	}
 	
 	
+	public int getMatrixBorderN() {
+		return offsetY + spaceForLabelY;
+	}
+	
+	
+	public int getMatrixBorderE() {
+		return offsetX + spaceForLabelX + (numberOfElements*matrixBlockSize);
+	}
+	
+	
+	public int getMatrixBorderS() {
+		return offsetY + spaceForLabelY + (numberOfElements*matrixBlockSize);
+	}
+	
+	
+	public int getMatrixBorderW() {
+		return offsetX + spaceForLabelX;
+	}
+	
+	
 	@Override
 	protected void paintComponent(Graphics g) {
 		if (fm == null) {
@@ -128,7 +147,6 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 		// general declaration
 		int width = getWidth();
 		int height = getHeight();
-		int sizeOfMatrix = numberOfElements*matrixBlockSize;
 		
 		Graphics2D g2d = (Graphics2D)g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -137,8 +155,35 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 		g2d.setColor(background);
 		g2d.fillRect(0, 0, width, height);
 		
+		// draw the label of the mouse over the dendrogram
+		if (mouseOverDendrogram) {
+			float defaultFontSize = g2d.getFont().getSize();
+		    g2d.setFont(g2d.getFont().deriveFont(infoDendrogramFontSize));
+		    
+			Double value = (double) ((double)(mouseMovingX - getMatrixBorderE()) / dendroWidth);
+			String valueString = df.format(value);
+			
+			g.setColor(infoDendrogramBackground);
+			g2d.fillRoundRect(
+					mouseMovingX,
+					getMatrixBorderN() - 30,
+					fm.stringWidth(valueString) + 30, 30, 10, 10);
+			
+			g.setColor(infoDendrogramLines);
+			g2d.drawLine(mouseMovingX, getMatrixBorderN() - 3, mouseMovingX, getMatrixBorderS());
+			g2d.drawRoundRect(
+					mouseMovingX,
+					getMatrixBorderN() - 30,
+					fm.stringWidth(valueString) + 30, 30, 10, 10);
+			
+			g.setColor(infoDendrogramLabels);
+			g2d.drawString(valueString,
+					mouseMovingX + 10,
+					getMatrixBorderN() - 8);
+			g2d.setFont(g2d.getFont().deriveFont(defaultFontSize));
+		}
+		
 		// paint of the dendrogram
-		g2d.setColor(Color.WHITE);
 		root.drawDendrogram(this, g2d);
 
 		// draw the matrix
@@ -149,25 +194,44 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 			for(int b = 0; b < numberOfElements; b++) {
 				Double distanceValue = dm.getValue(coordinates.get(a), coordinates.get(b));
 				g2d.setColor(measureColor(distanceValue));
-				g2d.fillRect(offsetX + spaceForLabelX + x, offsetY + spaceForLabelY + y, matrixBlockSize, matrixBlockSize);
+				g2d.fillRect(getMatrixBorderW() + x, getMatrixBorderN() + y,
+						matrixBlockSize, matrixBlockSize);
 				y += matrixBlockSize;
 			}
 			x += matrixBlockSize;
 		}
 		
 		// draw the labels
-//		g.setColor(Color.GREEN);
 		g.setColor(new Color(172, 229, 254, (int) (255*(.8))));
 		for(int i = 0; i < numberOfElements; i++) {
 			String s = dm.getElements().get(coordinates.get(i)).getName();
 			int internalOffsetX = spaceForLabelX - fm.stringWidth(s) - 5;
-			int internalOffsetY = spaceForLabelY - 5;
 			// horizontal labels
 			g.drawString(s, offsetX + internalOffsetX, (int) (offsetY + spaceForLabelY + (matrixBlockSize/2) + 5 + (i*matrixBlockSize)));
 			// vertical labels
 //			g2d.rotate(Math.PI*3/2);
 //			g.drawString(s, -(offsetY + internalOffsetY), (int) (offsetX + spaceForLabelX + (matrixBlockSize/2) + (i*matrixBlockSize) + 5));
 //			g2d.rotate(Math.PI/2);
+		}
+		
+		// draw the dendrogram scale
+		g.setColor(scaleColor);
+		g.drawLine(
+				getMatrixBorderE(),
+				getMatrixBorderS(),
+				getMatrixBorderE() + dendroWidth,
+				getMatrixBorderS());
+		for (int i = 0; i <= 10; i++) {
+			String s = Double.toString(i/10.);
+			g.drawLine(
+					getMatrixBorderE() + (dendroWidth/10*i),
+					getMatrixBorderS() + 1,
+					getMatrixBorderE() + (dendroWidth/10*i),
+					getMatrixBorderS() + 6);
+			g.drawString(
+					s,
+					getMatrixBorderE() + (dendroWidth/10*i) - (fm.stringWidth(s) / 2) + 1,
+					getMatrixBorderS() + 20);
 		}
 		
 		// paint info box
@@ -256,26 +320,12 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 	 * @return the color object associated with the measure
 	 */
 	private Color measureColor(Double measure) {
-//		Color c = new Color(Color.HSBtoRGB(0f, 0.99f, 1-measure.floatValue()));
-//		Color c = new Color(172, 229, 254, (int) (255*(1-measure)));
-		Color c = new Color(matrixBrightestColor.getRed(), matrixBrightestColor.getGreen(), matrixBrightestColor.getBlue(), (int) (255*(1-measure)));
-		return c;
+		return new Color(matrixBrightestColor.getRed(), matrixBrightestColor.getGreen(), matrixBrightestColor.getBlue(), (int) (255*(1-measure)));
 	}
 
 
 	@Override
-	public void mouseClicked(MouseEvent e) {
-		mouseMovingX = e.getX();
-		mouseMovingY = e.getY();
-		
-		mouseOverMatrix = (
-				mouseMovingX > matrixBeginX &&
-				mouseMovingX < (matrixBeginX + matrixBlockSize*numberOfElements) &&
-				mouseMovingY > matrixBeginY &&
-				mouseMovingY < (matrixBeginY + matrixBlockSize*numberOfElements));
-		
-		repaint();
-	}
+	public void mouseClicked(MouseEvent e) {}
 
 
 	@Override
@@ -288,8 +338,8 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		movingX = e.getX();
-		movingY = e.getY();
+		mouseMovingX = e.getX();
+		mouseMovingY = e.getY();
 	}
 
 
@@ -299,39 +349,59 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		offsetX += e.getX() - movingX;
-		offsetY += e.getY() - movingY;
+		
+		offsetX -= mouseMovingX - e.getX();
+		offsetY -= mouseMovingY - e.getY();
+		
+		mouseMovingX = e.getX();
+		mouseMovingY = e.getY();
+		
 		matrixBeginX = offsetX + spaceForLabelX;
 		matrixBeginY = offsetY + spaceForLabelY;
+		
 		mouseOverMatrix = false;
+		
 		repaint();
-		movingX = e.getX();
-		movingY = e.getY();
 	}
 
 
 	@Override
-	public void mouseMoved(MouseEvent e) {}
+	public void mouseMoved(MouseEvent e) {
+		if (motionPixels++ == 5) {
+			mouseMovingX = e.getX();
+			mouseMovingY = e.getY();
+			
+			mouseOverDendrogram = (
+					mouseMovingX > getMatrixBorderE() &&
+					mouseMovingX < (getMatrixBorderE() + dendroWidth) &&
+					mouseMovingY > getMatrixBorderN() &&
+					mouseMovingY < getMatrixBorderS());
+			
+			mouseOverMatrix = (
+					mouseMovingX > getMatrixBorderW() &&
+					mouseMovingX < getMatrixBorderE() &&
+					mouseMovingY > getMatrixBorderN() &&
+					mouseMovingY < getMatrixBorderS());
+		
+			if (mouseOverDendrogram || mouseOverMatrix) {
+				repaint();
+			}
+			motionPixels = 0;
+		}
+	}
 
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		
 		matrixBlockSize += e.getWheelRotation();
-		dendroMaxLineLength += e.getWheelRotation();
 		
-		if (matrixBlockSize < 20 || matrixBlockSize > 200 || dendroMaxLineLength < 20 || dendroMaxLineLength > 200) {
+		if (matrixBlockSize < 20 || matrixBlockSize > 200) {
 			if (matrixBlockSize < 20) {
 				matrixBlockSize = 20;
 			}
 			if (matrixBlockSize > 200) {
 				matrixBlockSize = 200;
-			}
-			if (dendroMaxLineLength < 20) {
-				dendroMaxLineLength = 20;
-			}
-			if (dendroMaxLineLength > 200) {
-				dendroMaxLineLength = 200;
 			}
 			return;
 		}

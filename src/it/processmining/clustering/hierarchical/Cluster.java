@@ -1,12 +1,9 @@
 package it.processmining.clustering.hierarchical;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.processmining.analysis.performance.advanceddottedchartanalysis.ui.CoordinationUtil;
 
 import it.processmining.clustering.metric.JaccardDistance;
 import it.processmining.clustering.model.process.SetRepresentation;
@@ -177,18 +174,19 @@ public class Cluster {
 			
 			// calculate the length of the line, proportional to the distance of the cluster
 			Double clusterDistance = leftChild.getDistance(rightChild);
-			int lineLength = DendrogramWidget.dendroMinLineLength + (int) (clusterDistance * (DendrogramWidget.dendroMaxLineLength - DendrogramWidget.dendroMinLineLength));
+			int lineLength = dw.getMatrixBorderE() + (int) (DendrogramWidget.dendroWidth * clusterDistance) - maxX;
 			
 			// draw the three lines
 			g.drawLine(left.getX(), left.getY(), left.getX()+lineLength, left.getY());
 			g.drawLine(right.getX(), right.getY(), right.getX()+lineLength, right.getY());
 			g.drawLine(maxX+lineLength, minY, maxX+lineLength, minY+gapY);
-			
+			// draw the cluster oval
 			g.fillOval(maxX+lineLength-(DendrogramWidget.dendroCircleSize/2), minY+(gapY/2)-(DendrogramWidget.dendroCircleSize/2),
 					DendrogramWidget.dendroCircleSize, DendrogramWidget.dendroCircleSize);
-			
+			// draw the distance of the cluster
+			int below = ((minY+(gapY/2)-2) > (dw.getMatrixBorderS()+dw.getMatrixBorderN())/2)? 15 : 0;
 			g.setColor(DendrogramWidget.labelColor);
-			g.drawString(df.format(clusterDistance), maxX+lineLength+3, minY+(gapY/2)-2);
+			g.drawString(df.format(clusterDistance), maxX+lineLength+3, minY+(gapY/2)-2+below);
 			
 			return new Coordinates(maxX+lineLength, minY+(gapY/2));
 		}
