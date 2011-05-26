@@ -77,9 +77,10 @@ public class Cluster {
 	 * in the two clusters, UPGMA)
 	 * 
 	 * @param c the second cluster
+	 * @param alpha the convex combinator
 	 * @return the distance between the medoid of the two clusters
 	 */
-	public Double getDistance(Cluster c) {
+	public Double getDistance(Cluster c, double alpha) {
 		Double sumDistances = 0.0;
 		
 		Set<SetRepresentation> currentElements = getAllElements();
@@ -89,7 +90,7 @@ public class Cluster {
 		for (SetRepresentation c1 : currentElements) {
 			for (SetRepresentation c2 : otherElements) {
 				if (!c1.equals(c2)) {
-					sumDistances += JaccardDistance.getDistance(c1, c2);
+					sumDistances += JaccardDistance.getDistance(c1, c2, alpha);
 					size ++;
 				}
 			}
@@ -142,7 +143,7 @@ public class Cluster {
 //	}
 	
 	
-	public Coordinates drawDendrogram(DendrogramWidget dw, Graphics2D g) {
+	public Coordinates drawDendrogram(DendrogramWidget dw, Graphics2D g, double alpha) {
 		
 		if (getMaxDepth() == 0) {
 			
@@ -153,8 +154,8 @@ public class Cluster {
 			
 			// we are on the central body of the dendrogram
 			
-			Coordinates left = leftChild.drawDendrogram(dw, g);
-			Coordinates right= rightChild.drawDendrogram(dw, g);
+			Coordinates left = leftChild.drawDendrogram(dw, g, alpha);
+			Coordinates right= rightChild.drawDendrogram(dw, g, alpha);
 			
 			g.setColor(DendrogramWidget.dendroColor);
 			
@@ -173,7 +174,7 @@ public class Cluster {
 			}
 			
 			// calculate the length of the line, proportional to the distance of the cluster
-			Double clusterDistance = leftChild.getDistance(rightChild);
+			Double clusterDistance = leftChild.getDistance(rightChild, alpha);
 			int lineLength = dw.getMatrixBorderE() + (int) (DendrogramWidget.dendroWidth * clusterDistance) - maxX;
 			
 			// draw the three lines

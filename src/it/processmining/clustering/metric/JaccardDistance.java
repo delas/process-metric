@@ -26,12 +26,13 @@ public class JaccardDistance {
 	 * 
 	 * @param hn1 the first process
 	 * @param hn2 the second process
+	 * @param alpha the convex combinator
 	 * @return the Jaccard distance between the two processes
 	 */
-	public static double getDistance(HeuristicsNet hn1, HeuristicsNet hn2) {
+	public static double getDistance(HeuristicsNet hn1, HeuristicsNet hn2, double alpha) {
 		HeuristicsNetSetRepresentation hnsr1 = new HeuristicsNetSetRepresentation("", hn1);
 		HeuristicsNetSetRepresentation hnsr2 = new HeuristicsNetSetRepresentation("", hn2);
-		return getDistance(hnsr1, hnsr2);
+		return getDistance(hnsr1, hnsr2, alpha);
 	}
 	
 	
@@ -43,12 +44,13 @@ public class JaccardDistance {
 	 * 
 	 * @param first the first process
 	 * @param second the second process
+	 * @param alpha the convex combinator
 	 * @return the Jaccard distance between the two processes
 	 */
-	public static double getDistance(SetRepresentation first, SetRepresentation second) {
+	public static double getDistance(SetRepresentation first, SetRepresentation second, double alpha) {
 		double distancePositive = 1 - getJaccard(first.getFollowedConstraints(), second.getFollowedConstraints());
 		double distanceNegative = 1 - getJaccard(first.getNotFollowedConstraints(), second.getNotFollowedConstraints());
-		return (distancePositive + distanceNegative) / 2;
+		return (alpha*distancePositive) + ((1-alpha)*distanceNegative);
 	}
 	
 	

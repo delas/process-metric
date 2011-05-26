@@ -22,17 +22,19 @@ public class DendrogramTest {
 	
 	public static void main(String s[]) throws FileNotFoundException, IOException, ClusteringException {
 	
-		int total = 8;
+		int total = 10;
 		
 		HashSet<HeuristicsNetSetRepresentation> set = new HashSet<HeuristicsNetSetRepresentation>(total);
 		for (int i = 1; i <= total; i++) {
 			set.add(new HeuristicsNetSetRepresentation("Process " + i, new HeuristicsNetFromFile(new FileInputStream("/home/delas/desktop/models/"+i+".hn")).getNet()));
 		}
 		
-		DistanceMatrix dm = new DistanceMatrix(set);
-		Cluster root = HierarchicalClustering.cluster(set);
+		DistanceMatrix dm = new DistanceMatrix(set, 0.5);
+		Cluster root = HierarchicalClustering.cluster(set, 0.5);
 		
-		DendrogramWidget dw = new DendrogramWidget(dm, root);
+		DendrogramWidget dw = new DendrogramWidget(dm, root, 0.5);
+		
+		dw.getSVG();
 
 		
 		JFrame frame = new JFrame("Dendrogram test");

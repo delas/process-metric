@@ -8,7 +8,7 @@ import it.processmining.clustering.model.process.SetRepresentation;
 
 public class HierarchicalClustering {
 	
-	public static Cluster cluster(Set<? extends SetRepresentation> elements) throws ClusteringException {
+	public static Cluster cluster(Set<? extends SetRepresentation> elements, double alpha) throws ClusteringException {
 		
 		if (elements.size() < 2) {
 			throw new ClusteringException("Unsufficient number of elements");
@@ -29,7 +29,7 @@ public class HierarchicalClustering {
 			for (Cluster cluster1 : active) {
 				for (Cluster cluster2 : active) {
 					if (!cluster1.equals(cluster2)) {
-						Double currentDistance = cluster1.getDistance(cluster2);
+						Double currentDistance = cluster1.getDistance(cluster2, alpha);
 						if (currentDistance < bestDistance) {
 							bestDistance = currentDistance;
 							left = cluster1;

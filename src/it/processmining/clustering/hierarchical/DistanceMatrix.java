@@ -29,17 +29,19 @@ public class DistanceMatrix {
 	 * 
 	 * @param set the set of elements
 	 */
-	public DistanceMatrix(Set<? extends SetRepresentation> set) {
+	public DistanceMatrix(Set<? extends SetRepresentation> set, double alpha) {
 		elements = new Vector<SetRepresentation>(set.size());
 		elements.addAll(set);
-		calculateMatrix();
+		calculateMatrix(alpha);
 	}
 	
 	
 	/**
 	 * This private method calculates the distance matrix values
+	 * 
+	 * @param alpha the convex combinator
 	 */
-	private void calculateMatrix() {
+	private void calculateMatrix(double alpha) {
 		matrix = new SparseDoubleMatrix2D(elements.size(), elements.size());
 		
 //		matrix = new Vector<Vector<Double>>(elements.size());
@@ -52,7 +54,7 @@ public class DistanceMatrix {
 		
 		for (int i = 0; i < elements.size(); i++) {
 			for (int j = 0; j < i + 1; j++) {
-				Double m = JaccardDistance.getDistance(elements.get(i), elements.get(j));
+				Double m = JaccardDistance.getDistance(elements.get(i), elements.get(j), alpha);
 				setValue(i, j, m);
 			}
 		}

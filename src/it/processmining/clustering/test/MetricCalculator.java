@@ -21,7 +21,7 @@ public class MetricCalculator {
 			HeuristicsNetFromFile hnff = new HeuristicsNetFromFile(new FileInputStream(args[0]));
 			HeuristicsNetFromFile hnff2 = new HeuristicsNetFromFile(new FileInputStream(args[1]));
 			
-			System.out.println("Jaccard: " + JaccardDistance.getDistance(hnff.getNet(), hnff2.getNet()));
+			System.out.println("Jaccard: " + JaccardDistance.getDistance(hnff.getNet(), hnff2.getNet(), 0.5));
 		}
 
 	}

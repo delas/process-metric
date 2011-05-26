@@ -26,7 +26,7 @@ public class ClusterCalculator {
 		set.add(new HeuristicsNetSetRepresentation("hn-xor", hnff2.getNet()));
 		set.add(new HeuristicsNetSetRepresentation("hn-and", hnff3.getNet()));
 		
-		DistanceMatrix dm = new DistanceMatrix(set);
+		DistanceMatrix dm = new DistanceMatrix(set, 0.5);
 		System.out.println(dm);
 //		Cluster root = HierarchicalClustering.cluster(set);
 //		System.out.println(root.getAllElements());

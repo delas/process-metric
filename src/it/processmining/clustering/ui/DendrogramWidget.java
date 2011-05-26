@@ -5,7 +5,6 @@ import it.processmining.clustering.hierarchical.DistanceMatrix;
 import it.processmining.clustering.model.process.SetRepresentation;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -15,13 +14,27 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.text.DecimalFormat;
 import java.util.Vector;
 
 import javax.swing.JComponent;
+
+import org.apache.batik.dom.GenericDOMImplementation;
+import org.apache.batik.svggen.SVGGraphics2D;
+import org.apache.batik.svggen.SVGGraphics2DIOException;
+import org.apache.batik.transcoder.TranscoderException;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.fop.svg.PDFTranscoder;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
 
 /**
  *
@@ -64,6 +77,7 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 	private int numberOfElements;
 	private Vector<Integer> coordinates;
 	private FontMetrics fm;
+	private double alpha;
 	
 	private int currentX;
 	private int currentY;
@@ -72,7 +86,7 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 	private int offsetY = 10; 
 	
 	private int spaceForLabelX = 100;
-	private int spaceForLabelY = 100;
+	private int spaceForLabelY = 0;
 	
 	DecimalFormat df = new DecimalFormat("#.###");
 	
@@ -86,10 +100,11 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 	private int motionPixels = 0;
 	
 	
-	public DendrogramWidget(DistanceMatrix dm, Cluster root) {
+	public DendrogramWidget(DistanceMatrix dm, Cluster root, double alpha) {
 		this.dm = dm;
 		this.root = root;
 		this.numberOfElements = dm.getElements().size();
+		this.alpha = alpha;
 		coordinates = new Vector<Integer>();
 		
 		addMouseListener(this);
@@ -135,8 +150,59 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 	}
 	
 	
+	public void getSVG() {
+		DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
+		String svgNS = "http://www.w3.org/2000/svg";
+		Document document = domImpl.createDocument(svgNS, "svg", null);
+		SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
+		paintComponent(svgGenerator);
+		
+		boolean useCSS = true; // we want to use CSS style attributes
+		try {
+        	Writer out = new OutputStreamWriter(System.out, "UTF-8");
+			svgGenerator.stream(out, useCSS);
+		} catch (SVGGraphics2DIOException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	public void getPDF() {
+		DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
+		String svgNS = "http://www.w3.org/2000/svg";
+		Document document = domImpl.createDocument(svgNS, "svg", null);
+		SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
+		paintComponent(svgGenerator);
+		
+		try {
+			PDFTranscoder t = new PDFTranscoder();
+			TranscoderInput ti = new TranscoderInput(document);
+			OutputStream ostream = new FileOutputStream("/home/delas/desktop/asd.pdf");
+			TranscoderOutput to = new TranscoderOutput(ostream);
+			t.transcode(ti, to);
+			ostream.flush();
+			ostream.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (TranscoderException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+	
+	
+//	protected void paintSVG(Graphics2D g2d) {
+//		
+//	}
+	
+	
 	@Override
 	protected void paintComponent(Graphics g) {
+		
 		if (fm == null) {
 			fm = g.getFontMetrics();
 		}
@@ -184,7 +250,7 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 		}
 		
 		// paint of the dendrogram
-		root.drawDendrogram(this, g2d);
+		root.drawDendrogram(this, g2d, alpha);
 
 		// draw the matrix
 		int x = 0;
@@ -309,7 +375,7 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 		}
 		
 		g2d.dispose();
-
+ 
 	}
 
 
@@ -367,7 +433,7 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		if (motionPixels++ == 5) {
+//		if (motionPixels++ == 5) {
 			mouseMovingX = e.getX();
 			mouseMovingY = e.getY();
 			
@@ -387,7 +453,7 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 				repaint();
 			}
 			motionPixels = 0;
-		}
+//		}
 	}
 
 
