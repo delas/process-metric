@@ -14,6 +14,8 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -150,108 +152,165 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 	}
 	
 	
-	public void getSVG() {
+	public void getSVG(String filename) {
 		DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
 		String svgNS = "http://www.w3.org/2000/svg";
 		Document document = domImpl.createDocument(svgNS, "svg", null);
 		SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
 		paintComponent(svgGenerator);
 		
-		boolean useCSS = true; // we want to use CSS style attributes
+		boolean useCSS = true;
 		try {
-        	Writer out = new OutputStreamWriter(System.out, "UTF-8");
-			svgGenerator.stream(out, useCSS);
+			svgGenerator.stream(filename, useCSS);
 		} catch (SVGGraphics2DIOException e) {
 			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
 		}
 	}
-	
-	
-	public void getPDF() {
-		DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
-		String svgNS = "http://www.w3.org/2000/svg";
-		Document document = domImpl.createDocument(svgNS, "svg", null);
-		SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
-		paintComponent(svgGenerator);
-		
-		try {
-			PDFTranscoder t = new PDFTranscoder();
-			TranscoderInput ti = new TranscoderInput(document);
-			OutputStream ostream = new FileOutputStream("/home/delas/desktop/asd.pdf");
-			TranscoderOutput to = new TranscoderOutput(ostream);
-			t.transcode(ti, to);
-			ostream.flush();
-			ostream.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (TranscoderException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-	
-	
-//	protected void paintSVG(Graphics2D g2d) {
-//		
-//	}
 	
 	
 	@Override
 	protected void paintComponent(Graphics g) {
-		
 		if (fm == null) {
 			fm = g.getFontMetrics();
 		}
 		
 		currentX = offsetX + spaceForLabelX + matrixBlockSize * numberOfElements;
 		currentY = offsetY + spaceForLabelY + matrixBlockSize / 2;
+	
+		((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		
-		// general declaration
-		int width = getWidth();
-		int height = getHeight();
+		drawBackground(g, getWidth(), getHeight());
+		drawDendrogram(g);
+		drawMatrix(g);
 		
-		Graphics2D g2d = (Graphics2D)g;
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		
-		// draw background
-		g2d.setColor(background);
-		g2d.fillRect(0, 0, width, height);
-		
-		// draw the label of the mouse over the dendrogram
 		if (mouseOverDendrogram) {
-			float defaultFontSize = g2d.getFont().getSize();
-		    g2d.setFont(g2d.getFont().deriveFont(infoDendrogramFontSize));
-		    
-			Double value = (double) ((double)(mouseMovingX - getMatrixBorderE()) / dendroWidth);
-			String valueString = df.format(value);
-			
-			g.setColor(infoDendrogramBackground);
-			g2d.fillRoundRect(
-					mouseMovingX,
-					getMatrixBorderN() - 30,
-					fm.stringWidth(valueString) + 30, 30, 10, 10);
-			
-			g.setColor(infoDendrogramLines);
-			g2d.drawLine(mouseMovingX, getMatrixBorderN() - 3, mouseMovingX, getMatrixBorderS());
-			g2d.drawRoundRect(
-					mouseMovingX,
-					getMatrixBorderN() - 30,
-					fm.stringWidth(valueString) + 30, 30, 10, 10);
-			
-			g.setColor(infoDendrogramLabels);
-			g2d.drawString(valueString,
-					mouseMovingX + 10,
-					getMatrixBorderN() - 8);
-			g2d.setFont(g2d.getFont().deriveFont(defaultFontSize));
+			drawOverlayDendrogram(g);
 		}
 		
-		// paint of the dendrogram
-		root.drawDendrogram(this, g2d, alpha);
-
+		if (mouseOverMatrix) {
+			drawOverlayMatrix(g);
+		}
+		
+		g.dispose();
+ 
+	}
+	
+	
+	private void drawOverlayDendrogram(Graphics g) {
+		float defaultFontSize = g.getFont().getSize();
+	    g.setFont(g.getFont().deriveFont(infoDendrogramFontSize));
+	    
+		Double value = (double) ((double)(mouseMovingX - getMatrixBorderE()) / dendroWidth);
+		String valueString = df.format(value);
+		
+		g.setColor(infoDendrogramBackground);
+		g.fillRoundRect(
+				mouseMovingX,
+				getMatrixBorderN() - 30,
+				fm.stringWidth(valueString) + 30, 30, 10, 10);
+		
+		g.setColor(infoDendrogramLines);
+		g.drawLine(mouseMovingX, getMatrixBorderN() - 3, mouseMovingX, getMatrixBorderS());
+		g.drawRoundRect(
+				mouseMovingX,
+				getMatrixBorderN() - 30,
+				fm.stringWidth(valueString) + 30, 30, 10, 10);
+		
+		g.setColor(infoDendrogramLabels);
+		g.drawString(valueString,
+				mouseMovingX + 10,
+				getMatrixBorderN() - 8);
+		g.setFont(g.getFont().deriveFont(defaultFontSize));
+	}
+	
+	
+	private void drawOverlayMatrix(Graphics g) {
+		int xCoord = (mouseMovingX - matrixBeginX) / matrixBlockSize;
+		int yCoord = (mouseMovingY - matrixBeginY) / matrixBlockSize;
+		
+		g.setColor(infoBoxLines);
+		// oval on the cell
+		g.drawOval(
+				matrixBeginX + (xCoord*matrixBlockSize) + (matrixBlockSize/2) - 5,
+				matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize/2) - 5,
+				10, 10);
+		// connector from the matrix border to the oval
+		g.drawLine(
+				matrixBeginX,
+				matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize/2),
+				matrixBeginX + (xCoord*matrixBlockSize) + (matrixBlockSize/2) - 6,
+				matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize/2));
+		// connector from the oval to the infobox
+		g.drawLine(
+				matrixBeginX + (xCoord*matrixBlockSize) + (matrixBlockSize/2) + 4,
+				matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize/2) + 4,
+				(int) (matrixBeginX + (xCoord*matrixBlockSize) + (matrixBlockSize*.75) + 2),
+				(int) (matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize*.75) + 2));
+		
+		if (xCoord != yCoord) {
+			// second oval
+			g.drawOval(
+					matrixBeginX + (yCoord*matrixBlockSize) + (matrixBlockSize/2) - 5,
+					matrixBeginY + (xCoord*matrixBlockSize) + (matrixBlockSize/2) - 5,
+					10, 10);
+			// connector between the two ovals
+			int mult = (xCoord > yCoord)? -1 : 1;
+			g.drawLine(
+					matrixBeginX + (xCoord*matrixBlockSize) + (matrixBlockSize/2) + (4*mult),
+					matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize/2) - (4*mult),
+					matrixBeginX + (yCoord*matrixBlockSize) + (matrixBlockSize/2) - (4*mult),
+					matrixBeginY + (xCoord*matrixBlockSize) + (matrixBlockSize/2) + (4*mult));
+			// connector from the second oval to the matrix border
+			g.drawLine(
+					matrixBeginX,
+					matrixBeginY + (xCoord*matrixBlockSize) + (matrixBlockSize/2),
+					matrixBeginX + (yCoord*matrixBlockSize) + (matrixBlockSize/2) - 6,
+					matrixBeginY + (xCoord*matrixBlockSize) + (matrixBlockSize/2));
+		}
+		
+		int infoBoxOffset = (xCoord*matrixBlockSize);
+		Double dis = dm.getValue(coordinates.get(xCoord), coordinates.get(yCoord));
+		String textLine1 = "Similarity: " + df.format(1-dis);
+		String textLine2 = "Distance: " + df.format(dis);
+		int infoBoxWidth = fm.stringWidth(textLine1);
+		if (fm.stringWidth(textLine2) > infoBoxWidth) infoBoxWidth = fm.stringWidth(textLine2);
+		
+		// the actual info box
+		g.setColor(infoBoxBackground);
+		g.fillRoundRect(
+				(int) (matrixBeginX + infoBoxOffset + (matrixBlockSize*.75)),
+				(int) (matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize*.75)),
+				infoBoxWidth + 20, 38, 10, 10);
+		g.setColor(infoBoxLines);
+		g.drawRoundRect(
+				(int) (matrixBeginX + infoBoxOffset + (matrixBlockSize*.75)),
+				(int) (matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize*.75)),
+				infoBoxWidth + 20, 38, 10, 10);
+		
+		// texts inside the info box
+		g.setColor(infoBoxLabels);
+		g.drawString(textLine1, 
+				(int) (matrixBeginX + infoBoxOffset + (matrixBlockSize*.75) + 10), 
+				(int) (matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize*.75) + 17));
+		g.drawString(textLine2, 
+				(int) (matrixBeginX + infoBoxOffset + (matrixBlockSize*.75) + 10), 
+				(int) (matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize*.75) + 32));
+	}
+	
+	
+	private void drawBackground(Graphics g, int width, int height) {
+		g.setColor(background);
+		g.fillRect(0, 0, width, height);
+	}
+	
+	
+	private void drawMatrix(Graphics g) {
+		// draw the background
+		g.setColor(background);
+		g.fillRect(0, 0,
+				spaceForLabelX + offsetX + numberOfElements*matrixBlockSize,
+				spaceForLabelY + offsetY + numberOfElements*matrixBlockSize + 20);
+		
 		// draw the matrix
 		int x = 0;
 		int y = 0;
@@ -259,8 +318,8 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 			y = 0;
 			for(int b = 0; b < numberOfElements; b++) {
 				Double distanceValue = dm.getValue(coordinates.get(a), coordinates.get(b));
-				g2d.setColor(measureColor(distanceValue));
-				g2d.fillRect(getMatrixBorderW() + x, getMatrixBorderN() + y,
+				g.setColor(measureColor(distanceValue));
+				g.fillRect(getMatrixBorderW() + x, getMatrixBorderN() + y,
 						matrixBlockSize, matrixBlockSize);
 				y += matrixBlockSize;
 			}
@@ -279,6 +338,18 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 //			g.drawString(s, -(offsetY + internalOffsetY), (int) (offsetX + spaceForLabelX + (matrixBlockSize/2) + (i*matrixBlockSize) + 5));
 //			g2d.rotate(Math.PI/2);
 		}
+	}
+	
+	
+	private void drawDendrogram(Graphics g) {
+		// draw the background
+		g.setColor(background);
+		g.fillRect(spaceForLabelX + offsetX + numberOfElements*matrixBlockSize, 0,
+				dendroWidth + 10,
+				spaceForLabelY + offsetY + numberOfElements*matrixBlockSize + 20);
+		
+		// paint of the dendrogram
+		root.drawDendrogram(this, g, alpha);
 		
 		// draw the dendrogram scale
 		g.setColor(scaleColor);
@@ -299,84 +370,8 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 					getMatrixBorderE() + (dendroWidth/10*i) - (fm.stringWidth(s) / 2) + 1,
 					getMatrixBorderS() + 20);
 		}
-		
-		// paint info box
-		if (mouseOverMatrix) {
-			int xCoord = (mouseMovingX - matrixBeginX) / matrixBlockSize;
-			int yCoord = (mouseMovingY - matrixBeginY) / matrixBlockSize;
-			
-			g2d.setColor(infoBoxLines);
-			// oval on the cell
-			g2d.drawOval(
-					matrixBeginX + (xCoord*matrixBlockSize) + (matrixBlockSize/2) - 5,
-					matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize/2) - 5,
-					10, 10);
-			// connector from the matrix border to the oval
-			g2d.drawLine(
-					matrixBeginX,
-					matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize/2),
-					matrixBeginX + (xCoord*matrixBlockSize) + (matrixBlockSize/2) - 6,
-					matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize/2));
-			// connector from the oval to the infobox
-			g2d.drawLine(
-					matrixBeginX + (xCoord*matrixBlockSize) + (matrixBlockSize/2) + 4,
-					matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize/2) + 4,
-					(int) (matrixBeginX + (xCoord*matrixBlockSize) + (matrixBlockSize*.75) + 2),
-					(int) (matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize*.75) + 2));
-			
-			if (xCoord != yCoord) {
-				// second oval
-				g2d.drawOval(
-						matrixBeginX + (yCoord*matrixBlockSize) + (matrixBlockSize/2) - 5,
-						matrixBeginY + (xCoord*matrixBlockSize) + (matrixBlockSize/2) - 5,
-						10, 10);
-				// connector between the two ovals
-				int mult = (xCoord > yCoord)? -1 : 1;
-				g2d.drawLine(
-						matrixBeginX + (xCoord*matrixBlockSize) + (matrixBlockSize/2) + (4*mult),
-						matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize/2) - (4*mult),
-						matrixBeginX + (yCoord*matrixBlockSize) + (matrixBlockSize/2) - (4*mult),
-						matrixBeginY + (xCoord*matrixBlockSize) + (matrixBlockSize/2) + (4*mult));
-				// connector from the second oval to the matrix border
-				g2d.drawLine(
-						matrixBeginX,
-						matrixBeginY + (xCoord*matrixBlockSize) + (matrixBlockSize/2),
-						matrixBeginX + (yCoord*matrixBlockSize) + (matrixBlockSize/2) - 6,
-						matrixBeginY + (xCoord*matrixBlockSize) + (matrixBlockSize/2));
-			}
-			
-			int infoBoxOffset = (xCoord*matrixBlockSize);
-			Double dis = dm.getValue(coordinates.get(xCoord), coordinates.get(yCoord));
-			String textLine1 = "Similarity: " + df.format(1-dis);
-			String textLine2 = "Distance: " + df.format(dis);
-			int infoBoxWidth = fm.stringWidth(textLine1);
-			if (fm.stringWidth(textLine2) > infoBoxWidth) infoBoxWidth = fm.stringWidth(textLine2);
-			
-			// the actual info box
-			g.setColor(infoBoxBackground);
-			g2d.fillRoundRect(
-					(int) (matrixBeginX + infoBoxOffset + (matrixBlockSize*.75)),
-					(int) (matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize*.75)),
-					infoBoxWidth + 20, 38, 10, 10);
-			g2d.setColor(infoBoxLines);
-			g2d.drawRoundRect(
-					(int) (matrixBeginX + infoBoxOffset + (matrixBlockSize*.75)),
-					(int) (matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize*.75)),
-					infoBoxWidth + 20, 38, 10, 10);
-			
-			// texts inside the info box
-			g.setColor(infoBoxLabels);
-			g2d.drawString(textLine1, 
-					(int) (matrixBeginX + infoBoxOffset + (matrixBlockSize*.75) + 10), 
-					(int) (matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize*.75) + 17));
-			g2d.drawString(textLine2, 
-					(int) (matrixBeginX + infoBoxOffset + (matrixBlockSize*.75) + 10), 
-					(int) (matrixBeginY + (yCoord*matrixBlockSize) + (matrixBlockSize*.75) + 32));
-		}
-		
-		g2d.dispose();
- 
 	}
+	
 
 
 	/**
@@ -433,7 +428,7 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-//		if (motionPixels++ == 5) {
+		if (motionPixels++ == 3) {
 			mouseMovingX = e.getX();
 			mouseMovingY = e.getY();
 			
@@ -453,7 +448,7 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 				repaint();
 			}
 			motionPixels = 0;
-//		}
+		}
 	}
 
 

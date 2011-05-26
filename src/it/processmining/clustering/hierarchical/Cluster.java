@@ -1,5 +1,6 @@
 package it.processmining.clustering.hierarchical;
 
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.text.DecimalFormat;
 import java.util.HashSet;
@@ -143,7 +144,7 @@ public class Cluster {
 //	}
 	
 	
-	public Coordinates drawDendrogram(DendrogramWidget dw, Graphics2D g, double alpha) {
+	public Coordinates drawDendrogram(DendrogramWidget dw, Graphics g, double alpha) {
 		
 		if (getMaxDepth() == 0) {
 			
