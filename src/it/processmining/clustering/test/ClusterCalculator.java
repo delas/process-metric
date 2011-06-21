@@ -1,8 +1,6 @@
 package it.processmining.clustering.test;
 
-import it.processmining.clustering.hierarchical.Cluster;
 import it.processmining.clustering.hierarchical.DistanceMatrix;
-import it.processmining.clustering.hierarchical.HierarchicalClustering;
 import it.processmining.clustering.model.process.HeuristicsNetSetRepresentation;
 
 import java.io.FileInputStream;
@@ -10,7 +8,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashSet;
 
-import org.processmining.framework.models.heuristics.HeuristicsNet;
 import org.processmining.importing.heuristicsnet.HeuristicsNetFromFile;
 
 public class ClusterCalculator {

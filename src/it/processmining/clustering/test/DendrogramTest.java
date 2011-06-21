@@ -8,7 +8,6 @@ import it.processmining.clustering.model.process.HeuristicsNetSetRepresentation;
 import it.processmining.clustering.ui.DendrogramWidget;
 
 import java.awt.Dimension;
-import java.awt.GraphicsEnvironment;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -22,11 +21,16 @@ public class DendrogramTest {
 	
 	public static void main(String s[]) throws FileNotFoundException, IOException, ClusteringException {
 	
+		if (s.length != 1) {
+			System.err.println("Use: java -jar ... /path/to/examples/ (with trailing slash)");
+			System.exit(1);
+		}
+		
 		int total = 10;
 		
 		HashSet<HeuristicsNetSetRepresentation> set = new HashSet<HeuristicsNetSetRepresentation>(total);
 		for (int i = 1; i <= total; i++) {
-			set.add(new HeuristicsNetSetRepresentation("Process " + i, new HeuristicsNetFromFile(new FileInputStream("/home/delas/desktop/models/"+i+".hn")).getNet()));
+			set.add(new HeuristicsNetSetRepresentation("Process " + i, new HeuristicsNetFromFile(new FileInputStream(s[0] + i + ".hn")).getNet()));
 		}
 		
 		DistanceMatrix dm = new DistanceMatrix(set, 0.5);
@@ -34,7 +38,7 @@ public class DendrogramTest {
 		
 		DendrogramWidget dw = new DendrogramWidget(dm, root, 0.5);
 		
-		dw.getSVG();
+		dw.getSVG(s[0] + "test.svg");
 
 		
 		JFrame frame = new JFrame("Dendrogram test");
