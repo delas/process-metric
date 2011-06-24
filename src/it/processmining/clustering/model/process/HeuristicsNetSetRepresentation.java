@@ -7,12 +7,26 @@ import org.processmining.framework.models.heuristics.HNSubSet;
 import org.processmining.framework.models.heuristics.HeuristicsNet;
 
 
+/**
+ * Class for the representation of a Heuristics Net as a set of constraints
+ * 
+ * @author Andrea Burattin
+ * @version 0.1
+ *
+ */
 public class HeuristicsNetSetRepresentation extends SetRepresentation {
 	
 	private HeuristicsNet hn;
 	private int activityCounter;
 
 	
+	/**
+	 * Constructor of the representation, given the process name and its
+	 * representation as Heuristics Net
+	 * 
+	 * @param name
+	 * @param hn
+	 */
 	public HeuristicsNetSetRepresentation(String name, HeuristicsNet hn) {
 		this.hn = hn;
 		this.activityCounter = hn.size();

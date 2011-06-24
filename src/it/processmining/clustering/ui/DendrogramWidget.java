@@ -26,7 +26,8 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 
 /**
- *
+ * This is the actual widget for the representation of a dendrogram
+ * 
  * @author Andrea Burattin
  */
 @SuppressWarnings("serial")
@@ -89,6 +90,14 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 	private int motionPixels = 0;
 	
 	
+	/**
+	 * Widget constructor
+	 * 
+	 * @param dm the precalculated distance matrix 
+	 * @param root the root of the cluster
+	 * @param alpha the parameter for balancing the positive and negated
+	 * 			relations
+	 */
 	public DendrogramWidget(DistanceMatrix dm, Cluster root, double alpha) {
 		this.dm = dm;
 		this.root = root;
@@ -102,11 +111,22 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 	}
 	
 	
+	/**
+	 * Method for getting a new available X coordinates
+	 * 
+	 * @return
+	 */
 	public int askForX() {
 		return currentX;
 	}
 	
 	
+	/**
+	 * Method for getting a new available Y coordinate
+	 * 
+	 * @param c
+	 * @return
+	 */
 	public int askForY(SetRepresentation c) {
 		int index = dm.getIndexOfElements(c);
 		if (!coordinates.contains(index)) {
@@ -119,26 +139,51 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 	}
 	
 	
+	/**
+	 * Method to get north point of the distance matrix
+	 * 
+	 * @return
+	 */
 	public int getMatrixBorderN() {
 		return offsetY + spaceForLabelY;
 	}
 	
 	
+	/**
+	 * Method to get east point of the distance matrix
+	 * 
+	 * @return
+	 */
 	public int getMatrixBorderE() {
 		return offsetX + spaceForLabelX + (numberOfElements*matrixBlockSize);
 	}
 	
 	
+	/**
+	 * Method to get south point of the distance matrix
+	 * 
+	 * @return
+	 */
 	public int getMatrixBorderS() {
 		return offsetY + spaceForLabelY + (numberOfElements*matrixBlockSize);
 	}
 	
 	
+	/**
+	 * Method to get west point of the distance matrix
+	 * 
+	 * @return
+	 */
 	public int getMatrixBorderW() {
 		return offsetX + spaceForLabelX;
 	}
 	
 	
+	/**
+	 * Method to save the given dendrogram representation as an SVG file
+	 * 
+	 * @param filename where to save the image
+	 */
 	public void getSVG(String filename) {
 		DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
 		String svgNS = "http://www.w3.org/2000/svg";
@@ -183,6 +228,10 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 	}
 	
 	
+	/**
+	 * 
+	 * @param g
+	 */
 	private void drawOverlayDendrogram(Graphics g) {
 		float defaultFontSize = g.getFont().getSize();
 	    g.setFont(g.getFont().deriveFont(infoDendrogramFontSize));
@@ -211,6 +260,10 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 	}
 	
 	
+	/**
+	 * 
+	 * @param g
+	 */
 	private void drawOverlayMatrix(Graphics g) {
 		int xCoord = (mouseMovingX - matrixBeginX) / matrixBlockSize;
 		int yCoord = (mouseMovingY - matrixBeginY) / matrixBlockSize;
@@ -285,12 +338,22 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 	}
 	
 	
+	/**
+	 * 
+	 * @param g
+	 * @param width
+	 * @param height
+	 */
 	private void drawBackground(Graphics g, int width, int height) {
 		g.setColor(background);
 		g.fillRect(0, 0, width, height);
 	}
 	
 	
+	/**
+	 * 
+	 * @param g
+	 */
 	private void drawMatrix(Graphics g) {
 		// draw the background
 		g.setColor(background);
@@ -328,6 +391,10 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 	}
 	
 	
+	/**
+	 * 
+	 * @param g
+	 */
 	private void drawDendrogram(Graphics g) {
 		// draw the background
 		g.setColor(background);

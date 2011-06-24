@@ -11,8 +11,8 @@ public class Activity {
 	private String name;
 
 	/**
-	 * Activity constructor
-	 * @param name the name of the new activity
+	 * 
+	 * @param name
 	 */
 	public Activity(String name) {
 		this.name = name;
@@ -20,8 +20,8 @@ public class Activity {
 
 	
 	/**
-	 * Getter of the activity name
-	 * @return the name of the activity
+	 * 
+	 * @return
 	 */
 	public String getName() {
 		return name;

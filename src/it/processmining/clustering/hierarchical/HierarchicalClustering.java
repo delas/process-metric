@@ -6,8 +6,25 @@ import java.util.Vector;
 import it.processmining.clustering.exceptions.ClusteringException;
 import it.processmining.clustering.model.process.SetRepresentation;
 
+/**
+ * This class performs hierarchical clustering for the given set of elements
+ * 
+ * @author Andrea Burattin
+ * @version 0.1
+ *
+ */
 public class HierarchicalClustering {
 	
+	/**
+	 * The only, static, method of the class: here is where the hierarchical
+	 * clustering is actually performed
+	 * 
+	 * @param elements the set of element used to perform the clustering
+	 * @param alpha the parameter to balance the difference between positive and
+	 * 			negated relations
+	 * @return the cluster that is the root of the cluster
+	 * @throws ClusteringException
+	 */
 	public static Cluster cluster(Set<? extends SetRepresentation> elements, double alpha) throws ClusteringException {
 		
 		if (elements.size() < 2) {

@@ -1,7 +1,6 @@
 package it.processmining.clustering.hierarchical;
 
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,11 +11,18 @@ import it.processmining.clustering.ui.Coordinates;
 import it.processmining.clustering.ui.DendrogramWidget;
 import it.processmining.clustering.utils.Utils;
 
+/**
+ * A representation for cluster of processes
+ * 
+ * @author Andrea Burattin
+ * @version 0.1
+ *
+ */
 public class Cluster {
 
 	private static Integer globalId = 1;
 	
-	private Integer id;
+	@SuppressWarnings("unused") private Integer id;
 	private Integer maxDepth = 0;
 	private Integer minDepth = 0;
 	private SetRepresentation element = null;
@@ -26,6 +32,11 @@ public class Cluster {
 	private DecimalFormat df = new DecimalFormat("#.##");
 	
 	
+	/**
+	 * Constructor of a cluster, and add the first element
+	 * 
+	 * @param element
+	 */
 	public Cluster(SetRepresentation element) {
 		id = globalId++;
 		maxDepth = minDepth = 0;
@@ -33,6 +44,13 @@ public class Cluster {
 	}
 	
 	
+	/**
+	 * Constructor of a new cluster composed of two children (as in dendrogram
+	 * representation)
+	 * 
+	 * @param childLeft
+	 * @param childRight
+	 */
 	public Cluster(Cluster childLeft, Cluster childRight) {
 		id = globalId++;
 		setChildren(childLeft, childRight);
@@ -41,22 +59,44 @@ public class Cluster {
 	}
 	
 	
+	/**
+	 * Add a new element to the cluster
+	 * 
+	 * @param element
+	 */
 	public void addElement(SetRepresentation element) {
 		this.element = element;
 	}
 	
 	
+	/**
+	 * Set the two children of the current cluster
+	 * 
+	 * @param childLeft
+	 * @param childRight
+	 */
 	public void setChildren(Cluster childLeft, Cluster childRight) {
 		this.leftChild = childLeft;
 		this.rightChild = childRight;
 	}
 	
 	
+	/**
+	 * Get an array with, exactly, two elements: the left and right child 
+	 * 
+	 * @return
+	 */
 	public Cluster[] getChildren() {
 		return new Cluster[]{leftChild, rightChild};
 	}
 	
 	
+	/**
+	 * Get a set with all the elements of the cluster (including the children
+	 * cluster)
+	 * 
+	 * @return
+	 */
 	public Set<SetRepresentation> getAllElements() {
 		Set<SetRepresentation> s = new HashSet<SetRepresentation>();
 		if (element != null) {
@@ -144,6 +184,17 @@ public class Cluster {
 //	}
 	
 	
+	/**
+	 * This method is recursively used to draw the dendrogram of the current
+	 * clusters structure
+	 * 
+	 * @param dw the current dendrogram widget
+	 * @param g the graphics where the dendrogram is supposed to be drawn
+	 * @param alpha the parameter to balance the difference between positive and
+	 * 			negated relations
+	 * @return the coordinates of the point connecting the children below the
+	 * 			current cluster
+	 */
 	public Coordinates drawDendrogram(DendrogramWidget dw, Graphics g, double alpha) {
 		
 		if (getMaxDepth() == 0) {

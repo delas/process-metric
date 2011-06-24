@@ -6,6 +6,14 @@ import it.processmining.clustering.model.Activity;
 import it.processmining.clustering.model.BinaryConstraint;
 import it.processmining.clustering.model.ConstraintType;
 
+/**
+ * This is a class for the representation of a process as two set of relations
+ * (one is the "follow" and the other is the "not ).
+ * 
+ * @author Andrea Burattin
+ * @version 0.1
+ *
+ */
 public class SetRepresentation implements ProcessRepresentation {
 	
 	protected HashSet<BinaryConstraint> followedConstraints = new HashSet<BinaryConstraint>();
@@ -13,6 +21,12 @@ public class SetRepresentation implements ProcessRepresentation {
 	protected String name;
 	
 	
+	/**
+	 * Get the size of the given sets
+	 * 
+	 * @param ct the type of constraint to consider
+	 * @return the size of the set
+	 */
 	public int getSize(ConstraintType ct) {
 		if (ct.equals(ConstraintType.FOLLOWED_BY)) {
 			return followedConstraints.size();
@@ -23,32 +37,60 @@ public class SetRepresentation implements ProcessRepresentation {
 	}
 	
 	
+	/**
+	 * 
+	 * @param name
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 	
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public String getName() {
 		return name;
 	}
 	
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public HashSet<BinaryConstraint> getFollowedConstraints() {
 		return followedConstraints;
 	}
 	
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public HashSet<BinaryConstraint> getNotFollowedConstraints() {
 		return notFollowedConstraints;
 	}
 	
 	
+	/**
+	 * Add a new constraint as a followed relation, given two activities
+	 * 
+	 * @param first
+	 * @param second
+	 */
 	protected void addFollowedConstraint(Activity first, Activity second) {
 		BinaryConstraint bc = new BinaryConstraint(first, ConstraintType.FOLLOWED_BY, second);
 		followedConstraints.add(bc);
 	}
 	
 	
+	/**
+	 * Add a new constraint as a followed relation, given two activity names
+	 * 
+	 * @param firstName
+	 * @param secondName
+	 */
 	protected void addFollowedConstraint(String firstName, String secondName) {
 		Activity first = new Activity(firstName);
 		Activity second = new Activity(secondName);
@@ -56,12 +98,24 @@ public class SetRepresentation implements ProcessRepresentation {
 	}
 	
 	
+	/**
+	 * Add a new constraint as a not followed relation, given two activities
+	 * 
+	 * @param first
+	 * @param second
+	 */
 	protected void addNotFollowedConstraint(Activity first, Activity second) {
 		BinaryConstraint bc = new BinaryConstraint(first, ConstraintType.NOT_FOLLOWED_BY, second);
 		notFollowedConstraints.add(bc);
 	}
 	
 	
+	/**
+	 * Add a new constraint as a not followed relation, given two activity names
+	 * 
+	 * @param firstName
+	 * @param secondName
+	 */
 	protected void addNotFollowedConstraint(String firstName, String secondName) {
 		Activity first = new Activity(firstName);
 		Activity second = new Activity(secondName);
