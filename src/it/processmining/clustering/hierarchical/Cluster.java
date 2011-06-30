@@ -28,6 +28,7 @@ public class Cluster {
 	private SetRepresentation element = null;
 	private Cluster leftChild = null;
 	private Cluster rightChild = null;
+	private Double alpha = 0.0;
 	
 	private DecimalFormat df = new DecimalFormat("#.##");
 	
@@ -36,8 +37,10 @@ public class Cluster {
 	 * Constructor of a cluster, and add the first element
 	 * 
 	 * @param element
+	 * @param alpha the convex combinator
 	 */
-	public Cluster(SetRepresentation element) {
+	public Cluster(SetRepresentation element, Double alpha) {
+		this.alpha = alpha;
 		id = globalId++;
 		maxDepth = minDepth = 0;
 		addElement(element);
@@ -118,10 +121,9 @@ public class Cluster {
 	 * in the two clusters, UPGMA)
 	 * 
 	 * @param c the second cluster
-	 * @param alpha the convex combinator
 	 * @return the distance between the medoid of the two clusters
 	 */
-	public Double getDistance(Cluster c, double alpha) {
+	public Double getDistance(Cluster c) {
 		Double sumDistances = 0.0;
 		
 		Set<SetRepresentation> currentElements = getAllElements();
@@ -163,25 +165,44 @@ public class Cluster {
 	}
 	
 	
-//	/**
-//	 * This method recalculates the medoid of the cluster
-//	 */
-//	private void recalculateMedoid() {
-//		if (cluster != null && cluster.size() > 0) {
-//			if (cluster.size() == 1 || cluster.size() == 2) {
-//				medoid = cluster.iterator().next();
-//			} else {
-//				Double minDistance = 2.0;
-//				for (SetRepresentation e1 : cluster) {
-//					for (SetRepresentation e2 : cluster) {
-//						if (!e1.equals(e2)) {
-//							
-//						}
-//					}
-//				}
-//			}
-//		}
-//	}
+	/**
+	 * This method recalculates the medoid of the cluster
+	 * 
+	 * The medoid is calculated as the element that minimizes the total distance
+	 * to other objects in the same cluster
+	 * 
+	 * @return the medoid of the current cluster
+	 */
+	@SuppressWarnings("unused")
+	private SetRepresentation getMedoid() {
+		Set<SetRepresentation> cluster = getAllElements();
+		// if the cluster is empty, return null
+		if (cluster.isEmpty()) {
+			return null;
+		}
+		
+		// initial values for the two temporary variables
+		SetRepresentation medoid = null;
+		Double currentMedoidDistance = Double.MAX_VALUE;
+		
+		// iterate through all the couples of processes
+		for (SetRepresentation e1 : cluster) {
+			Double currentDistance = 0.0;
+			// calculate the distance with all the other processes
+			for (SetRepresentation e2 : cluster) {
+				if (!e1.equals(e2)) {
+					currentDistance += JaccardDistance.getDistance(e1, e2, alpha);
+				}
+			}
+			// the current process is actually better then the current medoid
+			if (currentDistance < currentMedoidDistance) {
+				currentMedoidDistance = currentDistance;
+				medoid = e1;
+			}
+		}
+		
+		return medoid;
+	}
 	
 	
 	/**
@@ -190,12 +211,10 @@ public class Cluster {
 	 * 
 	 * @param dw the current dendrogram widget
 	 * @param g the graphics where the dendrogram is supposed to be drawn
-	 * @param alpha the parameter to balance the difference between positive and
-	 * 			negated relations
 	 * @return the coordinates of the point connecting the children below the
 	 * 			current cluster
 	 */
-	public Coordinates drawDendrogram(DendrogramWidget dw, Graphics g, double alpha) {
+	public Coordinates drawDendrogram(DendrogramWidget dw, Graphics g) {
 		
 		if (getMaxDepth() == 0) {
 			
@@ -206,8 +225,8 @@ public class Cluster {
 			
 			// we are on the central body of the dendrogram
 			
-			Coordinates left = leftChild.drawDendrogram(dw, g, alpha);
-			Coordinates right= rightChild.drawDendrogram(dw, g, alpha);
+			Coordinates left = leftChild.drawDendrogram(dw, g);
+			Coordinates right= rightChild.drawDendrogram(dw, g);
 			
 			g.setColor(DendrogramWidget.dendroColor);
 			
@@ -226,7 +245,7 @@ public class Cluster {
 			}
 			
 			// calculate the length of the line, proportional to the distance of the cluster
-			Double clusterDistance = leftChild.getDistance(rightChild, alpha);
+			Double clusterDistance = leftChild.getDistance(rightChild);
 			int lineLength = dw.getMatrixBorderE() + (int) (DendrogramWidget.dendroWidth * clusterDistance) - maxX;
 			
 			// draw the three lines

@@ -33,7 +33,7 @@ public class HierarchicalClustering {
 		
 		Vector<Cluster> active = new Vector<Cluster>();
 		for (SetRepresentation sr : elements) {
-			active.add(new Cluster(sr));
+			active.add(new Cluster(sr, alpha));
 		}
 		
 		Cluster root = null;
@@ -46,7 +46,7 @@ public class HierarchicalClustering {
 			for (Cluster cluster1 : active) {
 				for (Cluster cluster2 : active) {
 					if (!cluster1.equals(cluster2)) {
-						Double currentDistance = cluster1.getDistance(cluster2, alpha);
+						Double currentDistance = cluster1.getDistance(cluster2);
 						if (currentDistance < bestDistance) {
 							bestDistance = currentDistance;
 							left = cluster1;

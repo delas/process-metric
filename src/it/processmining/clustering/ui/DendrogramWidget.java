@@ -67,7 +67,6 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 	private int numberOfElements;
 	private Vector<Integer> coordinates;
 	private FontMetrics fm;
-	private double alpha;
 	
 	private int currentX;
 	private int currentY;
@@ -95,14 +94,11 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 	 * 
 	 * @param dm the precalculated distance matrix 
 	 * @param root the root of the cluster
-	 * @param alpha the parameter for balancing the positive and negated
-	 * 			relations
 	 */
-	public DendrogramWidget(DistanceMatrix dm, Cluster root, double alpha) {
+	public DendrogramWidget(DistanceMatrix dm, Cluster root) {
 		this.dm = dm;
 		this.root = root;
 		this.numberOfElements = dm.getElements().size();
-		this.alpha = alpha;
 		coordinates = new Vector<Integer>();
 		
 		addMouseListener(this);
@@ -403,7 +399,7 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 				spaceForLabelY + offsetY + numberOfElements*matrixBlockSize + 20);
 		
 		// paint of the dendrogram
-		root.drawDendrogram(this, g, alpha);
+		root.drawDendrogram(this, g);
 		
 		// draw the dendrogram scale
 		g.setColor(scaleColor);

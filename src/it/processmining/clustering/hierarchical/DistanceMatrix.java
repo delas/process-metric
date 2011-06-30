@@ -19,6 +19,7 @@ public class DistanceMatrix {
 	
 	private Vector<SetRepresentation> elements = null;
 	private SparseDoubleMatrix2D matrix = null;
+	private Double alpha = 0.0;
 
 	
 	/**
@@ -27,6 +28,7 @@ public class DistanceMatrix {
 	 * @param set the set of elements
 	 */
 	public DistanceMatrix(Set<? extends SetRepresentation> set, double alpha) {
+		this.alpha = alpha;
 		elements = new Vector<SetRepresentation>(set.size());
 		elements.addAll(set);
 		calculateMatrix(alpha);
@@ -92,6 +94,15 @@ public class DistanceMatrix {
 	 */
 	public Vector<? extends SetRepresentation> getElements() {
 		return elements;
+	}
+	
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Double getAlpha() {
+		return alpha;
 	}
 	
 	
