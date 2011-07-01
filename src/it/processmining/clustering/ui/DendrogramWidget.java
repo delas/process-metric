@@ -67,6 +67,7 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 	private int numberOfElements;
 	private Vector<Integer> coordinates;
 	private FontMetrics fm;
+	private boolean firstPrint = true;
 	
 	private int currentX;
 	private int currentY;
@@ -200,6 +201,15 @@ public class DendrogramWidget extends JComponent implements MouseListener,
 	protected void paintComponent(Graphics g) {
 		if (fm == null) {
 			fm = g.getFontMetrics();
+		}
+		
+		// let's center the dendrogram in the window
+		if (firstPrint)	{
+			offsetX = (getWidth() / 2) - (spaceForLabelX / 2) - (matrixBlockSize * numberOfElements / 2) - (dendroWidth / 2);
+			offsetY = (getHeight() / 2) - (spaceForLabelY / 2) - (matrixBlockSize * numberOfElements / 2);
+			matrixBeginX = offsetX + spaceForLabelX;
+			matrixBeginY = offsetY + spaceForLabelY;
+			firstPrint = false;
 		}
 		
 		currentX = offsetX + spaceForLabelX + matrixBlockSize * numberOfElements;

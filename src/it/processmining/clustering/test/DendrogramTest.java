@@ -35,11 +35,7 @@ public class DendrogramTest {
 		
 		DistanceMatrix dm = new DistanceMatrix(set, 0.5);
 		Cluster root = HierarchicalClustering.cluster(set, 0.5);
-		
 		DendrogramWidget dw = new DendrogramWidget(dm, root);
-		
-		dw.getSVG(s[0] + "test.svg");
-
 		
 		JFrame frame = new JFrame("Dendrogram test");
 		frame.add(dw);
