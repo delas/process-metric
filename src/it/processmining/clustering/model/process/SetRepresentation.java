@@ -19,6 +19,7 @@ public class SetRepresentation implements ProcessRepresentation {
 	protected HashSet<BinaryConstraint> followedConstraints = new HashSet<BinaryConstraint>();
 	protected HashSet<BinaryConstraint> notFollowedConstraints = new HashSet<BinaryConstraint>();
 	protected String name;
+	protected Object processRepresentative;
 	
 	
 	/**
@@ -70,6 +71,24 @@ public class SetRepresentation implements ProcessRepresentation {
 	 */
 	public HashSet<BinaryConstraint> getNotFollowedConstraints() {
 		return notFollowedConstraints;
+	}
+	
+	
+	/**
+	 * 
+	 * @param processRepresentative
+	 */
+	public void setProcessRepresentative(Object processRepresentative) {
+		this.processRepresentative = processRepresentative;
+	}
+	
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Object getProcessRepresentative() {
+		return processRepresentative;
 	}
 	
 	
