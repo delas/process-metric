@@ -174,7 +174,7 @@ public class Cluster {
 	 * @return the medoid of the current cluster
 	 */
 	@SuppressWarnings("unused")
-	private SetRepresentation getMedoid() {
+	public SetRepresentation getMedoid() {
 		Set<SetRepresentation> cluster = getAllElements();
 		// if the cluster is empty, return null
 		if (cluster.isEmpty()) {
